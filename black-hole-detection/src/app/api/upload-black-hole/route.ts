@@ -12,13 +12,26 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (!file) {
       return Response.json({ message: "have not file" }, { status: 404 });
     }
-    Date.now()
+
+    let arraryLatLog: Array<string> = file.name.split(", ");
+    arraryLatLog[1] = arraryLatLog[1].split(".jpg")[0];
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const path = `/img/${file.name}`;
+    const path = `/img/${Date.now()}.jpg`;
+
     await writeFile("./public" + path, buffer);
     await client.connect();
-    await client.db("holedb").collection("black-hole").insertOne({ path });
+    await client
+      .db("holedb")
+      .collection("black-hole")
+      .insertOne({
+        path,
+        position: {
+          lat: Number(arraryLatLog[0]),
+          lng: Number(arraryLatLog[1]),
+        },
+      });
     return Response.json(
       { message: "Data saved successfully!" },
       { status: 201 }
