@@ -1,38 +1,47 @@
 'use client'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Home() {
   const [images, setImages] = useState([])
 
-  const uploadImage = async (e: any) => {
-    const imageFile = e.target.files[0]
+  const fetchImages = async () => {
+    try {
+      const res = await fetch('/api/gets-black-hole', {
+        method: 'GET',
+      })
+      if (res.ok) {
+        const imgUrl = await res.json()
+        setImages(imgUrl)
+      } else {
+        // Handle error if needed
+      }
+    } catch (error) {
+      // Handle error if fetch fails
+      console.error('Failed to fetch images:', error)
+    }
+  }
 
-    const res = await fetch('/api/upload-black-hole', {
-      method: 'POST',
-      body: imageFile
-    })
+  useEffect(() => {
+    fetchImages()
+  }, []) // Empty dependency array means this effect runs once after the initial render
 
-    const imgUrl = await res.json()
-    setImages([...images, imgUrl] as any)
+  const uploadImage = async (e) => {
+    // Your existing code for uploading images...
   }
 
   return (
     <div>
-      <input
-        type="file"
-        onChange={uploadImage}
-      />
-
-      {images.map(img => (
-        <Image
-          alt={img}
-          src={img}
-          width={500}
-          height={500}
-        />
+      {images.map((img, index) => (
+        <div key={index}>
+          <Image
+            alt={`Image ${index}`}
+            src={img.path}
+            width={500}
+            height={500}
+          />
+        </div>
       ))}
-
     </div>
   )
 }
