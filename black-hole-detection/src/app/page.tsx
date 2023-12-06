@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Button from '@/components/Button';
 import AleartMessage from '@/components/AleartMessage';
+import TableLatLng from '@/components/TableLatLng';
+import ButtonTable from '@/components/TableLatLng';
 
 interface holdImages {
   _id: string
@@ -26,10 +28,20 @@ export default function Home() {
     googleMapsApiKey: "AIzaSyAYo9E_FaMLIjTtPbqO4UGCcCgJm9P3xc0"
   })
 
-  const [holdImages, setHoldImages] = useState<[holdImages | undefined]>()
+  const [holdImages, setHoldImages] = useState<holdImages[]>([
+    {
+      _id: "null",
+      path: "null",
+      position: {
+        lat: 0,
+        lng: 0
+      }
+    }
+  ])
   const [openHoldImage, setOpenHoldImage] = useState<string>("")
   const [latLng, setLatLng] = useState<positionHold>({ lat: 0, lng: 0 })
   const [message, setMessage] = useState<string>("")
+  const [table, setTable] = useState<boolean>(false)
 
   const onLoad = useCallback(function callback(map: object | any) {
     const bounds = new google.maps.LatLngBounds();
@@ -57,9 +69,19 @@ export default function Home() {
           method: 'GET',
         })
         const data = await res.json()
+
         if (res.status != 200) {
           setMessage(data.message)
-          setHoldImages(undefined)
+          setHoldImages([
+            {
+              _id: "null",
+              path: "null",
+              position: {
+                lat: 0,
+                lng: 0
+              }
+            }
+          ])
           return
         }
         setHoldImages(data)
@@ -79,10 +101,26 @@ export default function Home() {
         }}
         onLoad={onLoad}
       >
+        <div style={{
+          position: 'absolute',
+          bottom: '50px',
+          left: '20px',
+        }}>
+          <Button
+            onClick={() => setTable(!table)}
+            backgroundColor={table ? "#f44336":"#03adfc"}
+            fontSize="24px"
+            buttonText={table ?"Close":"Open Table"}
+          />
+        </div>
+        {table &&
+          <TableLatLng
+            holds={holdImages}
+          />}
         {message &&
           <AleartMessage message={message} />
         }
-        {holdImages?.map((holdImage) => (
+        {holdImages?.map((holdImage: holdImages | any) => (
           <Marker
             key={holdImage?._id}
             position={holdImage!.position}
@@ -105,8 +143,10 @@ export default function Home() {
                 height={500}
                 onClick={() => setOpenHoldImage("")}
               />
-              <h1 style={{ color: "#f44336" }}>lat {latLng.lat}</h1>
-              <h1 style={{ color: "#f44336" }}>lng {latLng.lng}</h1>
+              <div style={{display:"flex",position:"fixed",width:500,justifyContent:"center"}}>
+              <h1 style={{ color: "#000000",marginRight:250 }}>lat {latLng.lat}</h1>
+              <h1 style={{ color: "#000000" }}>lng {latLng.lng}</h1>
+              </div>
               <button onClick={() => setOpenHoldImage("")}>Close</button>
             </div>
           </div>

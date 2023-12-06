@@ -37,7 +37,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { status: 201 }
     );
   } catch (error) {
-    return Response.json({ message: "Something went wrong!" }, { status: 500 });
+    return Response.json({ message: `Something went wrong!` }, { status: 500 });
   } finally {
     await client.close();
   }
