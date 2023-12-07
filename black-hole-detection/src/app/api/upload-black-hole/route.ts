@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const path = `uploads/img/${Date.now()}.jpg`;
+    const path = `/img/${Date.now()}.jpg`;
 
     await writeFile("./public" + path, buffer);
     await client.connect();
