@@ -4,7 +4,7 @@ import { MongoClient } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
-  const client = new MongoClient(process.env.MONGODB_URI!);
+  const client = new MongoClient("mongodb://127.0.0.1:27017");
 
   try {
     const searchParams = req.nextUrl.searchParams;

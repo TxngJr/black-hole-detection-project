@@ -4,7 +4,7 @@ import { MongoClient } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const client = new MongoClient(process.env.MONGODB_URI!);
+  const client = new MongoClient("mongodb://127.0.0.1:27017");
 
   try {
     const formData = await req.formData();
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const path = `/img/${Date.now()}.jpg`;
+    const path = `uploads/img/${Date.now()}.jpg`;
 
     await writeFile("./public" + path, buffer);
     await client.connect();
