@@ -5,7 +5,6 @@ import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import Button from '@/components/Button';
 import AleartMessage from '@/components/AleartMessage';
 import TableLatLng from '@/components/TableLatLng';
-import ButtonTable from '@/components/TableLatLng';
 
 interface holdImages {
   _id: string

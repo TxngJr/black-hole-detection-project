@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const buffer = Buffer.from(bytes);
     const path = `/img/${Date.now()}.jpg`;
 
-    await writeFile("./public" + path, buffer);
+    await writeFile(`${process.cwd()}/public` + path, buffer);
     await client.connect();
     await client
       .db("holedb")

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const client = new MongoClient("mongodb://127.0.0.1:27017");
-
+  req.body;
   try {
     await client.connect();
     const data = await client.db("holedb").collection("black-hole").find({}).toArray();

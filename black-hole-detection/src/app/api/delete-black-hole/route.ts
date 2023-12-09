@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       .db("holedb")
       .collection("black-hole")
       .deleteOne({ path: path });
-    await unlink("./public" + path);
+    await unlink(`${process.cwd()}/public` + path);
     return Response.json(
       { message: "Data deleted successfully!" },
       { status: 200 }
