@@ -14,6 +14,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     let arraryLatLog: Array<string> = file.name.split(", ");
+    if (Number(arraryLatLog[0]) == 0) {
+      return Response.json({ message: `Gps Error` }, { status: 404 });
+    }
     arraryLatLog[1] = arraryLatLog[1].split(".jpg")[0];
 
     const bytes = await file.arrayBuffer();
