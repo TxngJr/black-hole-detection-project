@@ -48,6 +48,33 @@ export default function Home() {
     map.fitBounds(bounds);
   }, [])
 
+  const fetchHoldImages = async () => {
+    try {
+      const res = await fetch('/api/gets-black-hole', {
+        method: 'GET',
+      })
+      const data = await res.json()
+
+      if (res.status != 200) {
+        setMessage(data.message)
+        setHoldImages([
+          {
+            _id: "null",
+            path: "null",
+            position: {
+              lat: 0,
+              lng: 0
+            }
+          }
+        ])
+        return
+      }
+      setHoldImages(data)
+    } catch (error) {
+      return
+    }
+  }
+
   const deleteHoldImage = async (path: string) => {
     try {
       const res = await fetch(`/api/delete-black-hole?path=${path}`, {
@@ -56,40 +83,15 @@ export default function Home() {
       const data = await res.json();
       setOpenHoldImage("")
       setMessage(data.message)
+      fetchHoldImages()
     } catch (error) {
       return
     }
   }
 
   useEffect(() => {
-    const fetchHoldImages = async () => {
-      try {
-        const res = await fetch('/api/gets-black-hole', {
-          method: 'GET',
-        })
-        const data = await res.json()
-
-        if (res.status != 200) {
-          setMessage(data.message)
-          setHoldImages([
-            {
-              _id: "null",
-              path: "null",
-              position: {
-                lat: 0,
-                lng: 0
-              }
-            }
-          ])
-          return
-        }
-        setHoldImages(data)
-      } catch (error) {
-        return
-      }
-    }
     fetchHoldImages()
-  }, [deleteHoldImage])
+  }, [])
 
   return isLoaded ? (
     <div>

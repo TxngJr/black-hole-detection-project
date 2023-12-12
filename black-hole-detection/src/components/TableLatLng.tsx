@@ -18,7 +18,7 @@ export default function TableLatLng(holds: holdImages[] | any) {
             transform: 'translateX(-50%)',
             boxSizing: 'border-box',
             overflowY: 'auto'
-            
+
         }}>
             <table style={{
                 width: '100%',
@@ -26,7 +26,7 @@ export default function TableLatLng(holds: holdImages[] | any) {
                 border: '1px solid black',
                 backgroundColor: "#FFFF",
                 fontFamily: 'Arial, sans-serif',
-                
+
             }}>
                 <thead>
                     <tr style={{ backgroundColor: '#03adfc' }}>
@@ -38,7 +38,7 @@ export default function TableLatLng(holds: holdImages[] | any) {
                 <tbody>
                     {holds.holds!.map((hold: any, index: any) => (
                         <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#f2f2f2' : 'transparent', color: "#000000" }}>
-                            <td style={{ padding: '12px', border: '1px solid black' }}>{index}</td>
+                            <td style={{ padding: '12px', border: '1px solid black' }}>{index + 1}</td>
                             <td style={{ padding: '12px', border: '1px solid black' }}>{hold.position.lat}</td>
                             <td style={{ padding: '12px', border: '1px solid black' }}>{hold.position.lng}</td>
                         </tr>
