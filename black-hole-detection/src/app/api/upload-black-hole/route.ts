@@ -21,15 +21,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const path = `/img/${Date.now()}.jpg`;
+    // const path = `/img/${Date.now()}.jpg`;
 
-    await writeFile(`${process.cwd()}/public` + path, buffer);
+    // await writeFile(`${process.cwd()}/public` + path, buffer);
     await client.connect();
     await client
       .db("holedb")
       .collection("black-hole")
       .insertOne({
-        path,
+        path: buffer,
         position: {
           lat: Number(arraryLatLog[0]),
           lng: Number(arraryLatLog[1]),

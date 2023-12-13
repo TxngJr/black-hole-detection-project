@@ -1,6 +1,6 @@
 "use server";
 import { unlink } from "fs/promises";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     await client
       .db("holedb")
       .collection("black-hole")
-      .deleteOne({ path: path });
+      .deleteOne({ _id: new ObjectId(path!) });
     await unlink(`${process.cwd()}/public` + path);
     return Response.json(
       { message: "Data deleted successfully!" },

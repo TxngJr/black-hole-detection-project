@@ -8,16 +8,16 @@ import TableLatLng from '@/components/TableLatLng';
 
 interface holdImages {
   _id: string
-  path: string
-  position: {
-    lat: number
-    lng: number
+  path?: string
+  position?: {
+    lat?: number
+    lng?: number
   }
 }
 
 interface positionHold {
-  lat: number
-  lng: number
+  lat?: number
+  lng?: number
 }
 
 export default function Home() {
@@ -37,8 +37,7 @@ export default function Home() {
       }
     }
   ])
-  const [openHoldImage, setOpenHoldImage] = useState<string>("")
-  const [latLng, setLatLng] = useState<positionHold>({ lat: 0, lng: 0 })
+  const [holdImage, setHoldImage] = useState<holdImages | any>("")
   const [message, setMessage] = useState<string>("")
   const [table, setTable] = useState<boolean>(false)
 
@@ -59,8 +58,8 @@ export default function Home() {
         setMessage(data.message)
         setHoldImages([
           {
-            _id: "null",
-            path: "null",
+            _id: "",
+            path: "",
             position: {
               lat: 0,
               lng: 0
@@ -81,7 +80,7 @@ export default function Home() {
         method: 'GET',
       })
       const data = await res.json();
-      setOpenHoldImage("")
+      setHoldImage("")
       setMessage(data.message)
       fetchHoldImages()
     } catch (error) {
@@ -90,7 +89,10 @@ export default function Home() {
   }
 
   useEffect(() => {
-    fetchHoldImages()
+    const interval = setInterval(() => {
+      fetchHoldImages()
+    }, 3000);
+    return () => clearInterval(interval);
   }, [])
 
   return isLoaded ? (
@@ -109,9 +111,9 @@ export default function Home() {
         }}>
           <Button
             onClick={() => setTable(!table)}
-            backgroundColor={table ? "#f44336":"#03adfc"}
+            backgroundColor={table ? "#f44336" : "#03adfc"}
             fontSize="24px"
-            buttonText={table ?"Close":"Open Table"}
+            buttonText={table ? "Close" : "Open Table"}
           />
         </div>
         {table &&
@@ -125,30 +127,30 @@ export default function Home() {
           <Marker
             key={holdImage?._id}
             position={holdImage!.position}
-            onClick={() => { setOpenHoldImage(holdImage!.path), setLatLng(holdImage!.position) }}
+            onClick={() => { setHoldImage(holdImage) }}
           />
         ))}
-        {openHoldImage && (
-          <div className="modal-overlay" onClick={() => setOpenHoldImage("")}>
+        {holdImage && (
+          <div className="modal-overlay" onClick={() => setHoldImage("")}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <Button
-                onClick={() => deleteHoldImage(openHoldImage)}
+                onClick={() => deleteHoldImage(holdImage._id)}
                 backgroundColor="#f44336"
                 fontSize="24px"
                 buttonText="Delete"
               />
               <Image
-                alt={`Image ${openHoldImage}`}
-                src={openHoldImage}
+                alt={`Image ${holdImage._id}`}
+                src={`data:image/png;base64,${holdImage.path}`}
                 width={500}
                 height={500}
-                onClick={() => setOpenHoldImage("")}
+                onClick={() => setHoldImage("")}
               />
-              <div style={{display:"flex",position:"fixed",width:500,justifyContent:"center"}}>
-              <h1 style={{ color: "#000000",marginRight:250 }}>lat {latLng.lat}</h1>
-              <h1 style={{ color: "#000000" }}>lng {latLng.lng}</h1>
+              <div style={{ display: "flex", position: "fixed", width: 500, justifyContent: "center" }}>
+                <h1 style={{ color: "#000000", marginRight: 250 }}>lat {holdImage.position.lat}</h1>
+                <h1 style={{ color: "#000000" }}>lng {holdImage.position.lng}</h1>
               </div>
-              <button onClick={() => setOpenHoldImage("")}>Close</button>
+              <button onClick={() => setHoldImage("")}>Close</button>
             </div>
           </div>
         )}
