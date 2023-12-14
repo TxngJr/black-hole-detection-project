@@ -19,13 +19,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
     arraryLatLog[1] = arraryLatLog[1].split(".jpg")[0];
 
-    const rawResponse = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${arraryLatLog[0]},${arraryLatLog[1]}&key=AIzaSyAYo9E_FaMLIjTtPbqO4UGCcCgJm9P3xc0`
-    );
-    const data = await rawResponse.json();
+    let address = "Unknown"
+    try{
 
+      const rawResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${arraryLatLog[0]},${arraryLatLog[1]}&key=AIzaSyAYo9E_FaMLIjTtPbqO4UGCcCgJm9P3xc0`
+        );
+        const data = await rawResponse.json();
+        const address = data.results[0].formatted_address;
+      }catch(error){
+        console.log("Have not data")
+      }
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
     // const path = `/img/${Date.now()}.jpg`;
 
     // await writeFile(`${process.cwd()}/public` + path, buffer);
@@ -39,7 +46,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           lat: Number(arraryLatLog[0]),
           lng: Number(arraryLatLog[1]),
         },
-        address: data.results[0].formatted_address,
+        address,
       });
     return Response.json(
       { message: "Data saved successfully!" },
