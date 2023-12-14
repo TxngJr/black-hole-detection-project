@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${arraryLatLog[0]},${arraryLatLog[1]}&key=AIzaSyAYo9E_FaMLIjTtPbqO4UGCcCgJm9P3xc0`
         );
         const data = await rawResponse.json();
-        const address = data.results[0].formatted_address;
+        address = data.results[0].formatted_address;
       }catch(error){
         console.log("Have not data")
       }
