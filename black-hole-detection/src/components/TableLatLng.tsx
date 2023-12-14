@@ -30,17 +30,19 @@ export default function TableLatLng(holds: holdImages[] | any) {
             }}>
                 <thead>
                     <tr style={{ backgroundColor: '#03adfc' }}>
-                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'left' }}>number</th>
-                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'left' }}>Latitude</th>
-                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'left' }}>Longitude</th>
+                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>number</th>
+                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>address</th>
+                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>Latitude</th>
+                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>Longitude</th>
                     </tr>
                 </thead>
                 <tbody>
                     {holds.holds!.map((hold: any, index: any) => (
                         <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#f2f2f2' : 'transparent', color: "#000000" }}>
-                            <td style={{ padding: '12px', border: '1px solid black' }}>{index + 1}</td>
-                            <td style={{ padding: '12px', border: '1px solid black' }}>{hold.position.lat}</td>
-                            <td style={{ padding: '12px', border: '1px solid black' }}>{hold.position.lng}</td>
+                            <td style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>{index + 1}</td>
+                            <td style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>{hold.address}</td>
+                            <td style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>{hold.position.lat}</td>
+                            <td style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>{hold.position.lng}</td>
                         </tr>
                     ))}
                 </tbody>
