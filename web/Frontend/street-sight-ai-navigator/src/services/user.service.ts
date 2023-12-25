@@ -1,16 +1,15 @@
+import { API_BASE_URL } from "../constants";
 import { ApiResponse } from "../interfaces/gobal.interface";
 import {
   ILoginApiRequestAndForm,
   IRegisterApiRequest,
 } from "../interfaces/user.interface";
 
-const URL_SERVER = "http://10.10.5.83:3000";
-
 export const registerApi = async (
   data: IRegisterApiRequest
 ): Promise<ApiResponse<any>> => {
   try {
-    const response = await fetch(URL_SERVER + "/users/register", {
+    const response = await fetch(API_BASE_URL + "/users/register", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -39,7 +38,7 @@ export const loginApi = async (
   data: ILoginApiRequestAndForm
 ): Promise<ApiResponse<any>> => {
   try {
-    const response: Response = await fetch(URL_SERVER + "/users/login", {
+    const response: Response = await fetch(API_BASE_URL + "/users/login", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -66,7 +65,7 @@ export const loginApi = async (
 
 export const selfApi = async (token: string): Promise<ApiResponse<any>> => {
   try {
-    const response: Response = await fetch(URL_SERVER + "/users/self", {
+    const response: Response = await fetch(API_BASE_URL + "/users/self", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -96,7 +95,7 @@ export const updateStatusUserApi = async (data: {
 }): Promise<ApiResponse<any>> => {
   try {
     const response: Response = await fetch(
-      URL_SERVER +
+      API_BASE_URL +
         `/users/change-status-user?_id=${data._id}&status=${data.status}`,
       {
         method: "GET",
@@ -128,7 +127,7 @@ export const deleteUserApi = async (data: {
 }): Promise<ApiResponse<any>> => {
   try {
     const response: Response = await fetch(
-      URL_SERVER + `/users/delete-user?_id=${data._id}`,
+      API_BASE_URL + `/users/delete-user?_id=${data._id}`,
       {
         method: "DELETE",
         headers: {
@@ -158,7 +157,7 @@ export const fetchUsersApi = async (
 ): Promise<ApiResponse<any>> => {
   try {
     const response: Response = await fetch(
-      URL_SERVER + "/users/fetch-users?page=1&pageSize=10",
+      API_BASE_URL + "/users/fetch-users?page=1&pageSize=10",
       {
         method: "GET",
         headers: {

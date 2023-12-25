@@ -1,6 +1,5 @@
+import { API_BASE_URL } from '../constants';
 import {ApiResponse} from '../interfaces/gobal.interface';
-
-const URL_SERVER = 'http://10.10.5.83:3000';
 
 
 export const deleteHoldApi = async (
@@ -9,7 +8,7 @@ export const deleteHoldApi = async (
 ): Promise<ApiResponse<any>> => {
   try {
     const response: Response = await fetch(
-      URL_SERVER + '/holds?_id=' + id,
+      API_BASE_URL + '/holds?_id=' + id,
       {
         method: 'DELETE',
         headers: {
@@ -38,7 +37,7 @@ export const getHoldsApi = async (
   token: string,
 ): Promise<ApiResponse<any>> => {
   try {
-    const response: Response = await fetch(URL_SERVER + '/holds/', {
+    const response: Response = await fetch(API_BASE_URL + '/holds/', {
       method: 'GET',
       headers: {
         Accept: 'application/json',

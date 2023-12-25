@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../constants";
 import { IHold } from "../interfaces/hold.interface"
 
 export default function TableLatLng(holds: IHold[] | any) {
@@ -7,24 +8,23 @@ export default function TableLatLng(holds: IHold[] | any) {
             top: '20px',
             left: '50%',
             transform: 'translateX(-50%)',
-            boxSizing: 'border-box',
             overflowY: 'scroll',
             height: 'calc(100vh - 40px)',
         }}>
             <table style={{
-                width: '100%',
+                // width: '100%',
                 borderCollapse: 'collapse',
+                display: 'inline-table',
                 border: '1px solid black',
                 backgroundColor: "#FFFF",
-                fontFamily: 'Arial, sans-serif',
             }}>
                 <thead>
                     <tr style={{ backgroundColor: '#03adfc' }}>
-                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>number</th>
-                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>address</th>
-                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>Latitude</th>
-                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>Longitude</th>
-                        <th style={{ padding: '12px', border: '1px solid black', textAlign: 'center' }}>img</th>
+                        <th style={{fontSize:"24px", padding: '12px', border: '1px solid black', textAlign: 'center' }}>number</th>
+                        <th style={{fontSize:"24px", padding: '12px', border: '1px solid black', textAlign: 'center' }}>address</th>
+                        <th style={{fontSize:"24px", padding: '12px', border: '1px solid black', textAlign: 'center' }}>Latitude</th>
+                        <th style={{fontSize:"24px", padding: '12px', border: '1px solid black', textAlign: 'center' }}>Longitude</th>
+                        <th style={{fontSize:"24px", padding: '12px', border: '1px solid black', textAlign: 'center' }}>img</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,7 +46,7 @@ export default function TableLatLng(holds: IHold[] | any) {
                                     objectFit: "cover"
                                 }}
                                 alt={`Image ${hold._id}`}
-                                src={`http://192.168.1.45:3000/holds/img?pathImg=${hold.path}`} // must change to your ip
+                                src={`${API_BASE_URL}/holds/img?pathImg=${hold.path}`} // must change to your ip
                             /></td>
                         </tr>
                     ))}
