@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express";
-import { RequestAndUser } from "../interfaces/user.interface";
+import { RequestAndUser, UserRole } from "../interfaces/user.interface";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -11,7 +11,7 @@ const checkAccessPermissionAdmin = async (
 ) => {
   const { role } = req.user!;
 
-  if (role !== "admin") {
+  if (role === UserRole.USER) {
     return res.status(400).json({ message: "This service for admin" });
   }
 

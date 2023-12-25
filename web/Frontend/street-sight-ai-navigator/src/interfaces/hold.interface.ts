@@ -8,3 +8,4 @@ export interface IHold {
   address: string;
   macAddress: string;
 }
+

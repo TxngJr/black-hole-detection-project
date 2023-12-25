@@ -56,7 +56,6 @@ const login = async (req: Request, res: Response) => {
         message: `Password or Username Wrong.`,
       });
     }
-
     const token = await jwt.sign(
       { _id: String(user._id) },
       process.env.JWT_SECRET!,
@@ -93,10 +92,13 @@ const deleteUser = async (req: Request, res: Response) => {
 
 const getUsers = async (req: RequestAndUser, res: Response) => {
   try {
+    const { _id } = req.user!;
     const { page, pageSize }: any = req.query;
-    const users: IUser[] | null = await UserModel.find({})
+
+    const users: IUser[] | null = await UserModel.find({ _id: { $ne: _id } })
       .skip((Number(page) - 1) * Number(pageSize))
       .limit(pageSize);
+
     return res.status(200).json(users);
   } catch (err) {
     return res.status(400).json({ message: "Have Something Wrong" });

@@ -1,6 +1,6 @@
 import {ApiResponse} from '../interfaces/gobal.interface';
 
-const URL_SERVER = 'http://192.168.1.45:3000';
+const URL_SERVER = 'http://10.10.5.83:3000';
 
 
 export const deleteHoldApi = async (

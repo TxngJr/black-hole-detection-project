@@ -143,7 +143,7 @@ function HomePage() {
                   objectFit: "cover",
                 }}
                 alt={`Image ${hold._id}`}
-                src={`http://192.168.1.45:3000/holds/img?pathImg=${hold.path}`} // must change to your ip
+                src={`http://10.10.5.83:3000/holds/img?pathImg=${hold.path}`} // must change to your ip
                 onClick={() => setHold(null)}
               />
             </div>

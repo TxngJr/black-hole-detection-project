@@ -6,7 +6,7 @@ import roleMiddleware from "../middlewares/role.middleware";
 const router = Router();
 router.get("/self", authMiddleware.authenticateToken, userController.self);
 router.get(
-  "/get-party",
+  "/fetch-users",
   authMiddleware.authenticateToken,
   roleMiddleware.checkAccessPermissionAdmin,
   userController.getUsers

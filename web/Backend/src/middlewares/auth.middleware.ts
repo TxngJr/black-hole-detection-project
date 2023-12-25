@@ -33,7 +33,7 @@ const authenticateToken = async (
       if (err) {
         return res.status(403).json({ message: "Token is expired" });
       }
-      let user: IUser | null = await UserModel.findOne(decode.id);
+      let user: IUser | null = await UserModel.findById(decode._id);
       if (!user) {
         return res.status(403).json({ message: "User Not Found" });
       }
