@@ -17,6 +17,12 @@ router.get(
   roleMiddleware.checkAccessPermissionAdmin,
   userController.changeStatusUser
 );
+router.get(
+  "/change-role-user",
+  authMiddleware.authenticateToken,
+  roleMiddleware.checkAccessPermissionAdmin,
+  userController.changeRoleUser
+);
 router.delete(
   "/delete-user",
   authMiddleware.authenticateToken,

@@ -113,7 +113,7 @@ function LoginPage() {
                 fontSize: "32px",
               }}
             >
-              username
+              Username
             </p>
             <input
               style={{
@@ -137,7 +137,7 @@ function LoginPage() {
                 fontSize: "32px",
               }}
             >
-              password
+            Password
             </p>
             <input
               style={{
@@ -167,7 +167,7 @@ function LoginPage() {
                 textAlign: "center",
                 fontSize: "32px",
                 marginBottom: "10%",
-                // border: "0px solid #FFFFFF",
+                cursor: "pointer",
               }}
               onClick={handleSubmit}
             >
@@ -192,6 +192,9 @@ function LoginPage() {
               style={{
                 color: "#59AFED",
                 fontSize: "20px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
               onClick={() => navigate("/register")}
             >
@@ -239,6 +242,7 @@ function LoginPage() {
               style={{
                 marginLeft: "1%",
                 fontSize: "24px",
+                whiteSpace: "nowrap",
               }}
             >
               แผนกวิชาเทคโนโลยีคอมพิวเตอร์ วิทยาลัยเทคนิคอุบลราชธานี

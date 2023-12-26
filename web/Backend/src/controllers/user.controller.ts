@@ -127,6 +127,28 @@ const changeStatusUser = async (req: RequestAndUser, res: Response) => {
   }
 };
 
+const changeRoleUser = async (req: RequestAndUser, res: Response) => {
+  try {
+    const { _id, role }: any = req.query;
+
+    if (!Object.values(UserRole).includes(role)) {
+      return res.status(400).json({
+        message: `Have not Role ${role}`,
+      });
+    }
+
+    const users: IUser | null = await UserModel.findByIdAndUpdate(_id, {
+      role,
+    });
+    if (!users) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ message: "Change role success" });
+  } catch (err) {
+    return res.status(400).json({ message: "Have Something Wrong" });
+  }
+};
+
 export default {
   register,
   login,
@@ -134,4 +156,5 @@ export default {
   deleteUser,
   getUsers,
   changeStatusUser,
+  changeRoleUser,
 };

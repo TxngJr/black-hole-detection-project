@@ -1,152 +1,198 @@
-import { API_BASE_URL } from "../constants";
 import { IHold } from "../interfaces/hold.interface";
+import { API_BASE_URL } from "../constants";
 
-export default function TableLatLng(holds: IHold[] | any) {
+interface Props {
+  holds: IHold[];
+  onClickCancel: () => void;
+}
+
+export default function TableLatLng(props: Props) {
   return (
     <div
       style={{
         position: "absolute",
-        top: "20px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        overflowY: "scroll",
-        height: "calc(100vh - 40px)",
+        left: "0",
+        right: "0",
+        top: "0",
+        bottom: "0",
+        backgroundColor: "rgba(0, 0, 0, 0.2)",
+        padding: "0 5%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <table
+      <div
         style={{
-          // width: '100%',
-          borderCollapse: "collapse",
-          display: "inline-table",
-          border: "1px solid black",
-          backgroundColor: "#FFFF",
+          position: "absolute",
+          bottom: "2%",
+          left: "1%",
         }}
       >
-        <thead>
-          <tr style={{ backgroundColor: "#03adfc" }}>
-            <th
+        <button
+          style={{
+            borderRadius: "50px",
+            background: "#f44336",
+            width: "120px",
+            padding: "6%",
+            textAlign: "center",
+            fontSize: "24px",
+            cursor: "pointer",
+          }}
+          onClick={() => props.onClickCancel()}
+        >
+          Close
+        </button>
+      </div>
+
+      <div
+        style={{
+          width: "90%",
+          height: "95%",
+          borderRadius: "20px",
+          background: "linear-gradient(180deg, #86DCAD 50%, #E9F191 100%)",
+          display: "block",
+        }}
+      >
+        <div
+          style={{
+            display: "block",
+            justifyContent: "center",
+            padding: "1%",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-around",
+              background: "#FFFFFF",
+              padding: "10px",
+              borderRadius: "10px",
+            }}
+          >
+            <div
               style={{
-                fontSize: "24px",
-                padding: "12px",
-                border: "1px solid black",
                 textAlign: "center",
+                width: "15%",
               }}
             >
-              number
-            </th>
-            <th
+              <h1>number</h1>
+            </div>
+            <div
               style={{
-                fontSize: "24px",
-                padding: "12px",
-                border: "1px solid black",
                 textAlign: "center",
+                width: "17.5%",
               }}
             >
-              address
-            </th>
-            <th
+              <h1>latitude</h1>
+            </div>
+            <div
               style={{
-                fontSize: "24px",
-                padding: "12px",
-                border: "1px solid black",
                 textAlign: "center",
+                width: "17.5%",
               }}
             >
-              Latitude
-            </th>
-            <th
+              <h1>longitude</h1>
+            </div>
+            <div
               style={{
-                fontSize: "24px",
-                padding: "12px",
-                border: "1px solid black",
                 textAlign: "center",
+                width: "20%",
               }}
             >
-              Longitude
-            </th>
-            <th
+              <h1>address</h1>
+            </div>
+            <div
               style={{
-                fontSize: "24px",
-                padding: "12px",
-                border: "1px solid black",
                 textAlign: "center",
+                width: "30%",
               }}
             >
-              img
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {holds.holds!.map((hold: any, index: any) => (
-            <tr
-              key={index}
-              style={{
-                backgroundColor: index % 2 === 0 ? "#f2f2f2" : "transparent",
-                color: "#000000",
-              }}
-            >
-              <td
+              <h1>img</h1>
+            </div>
+          </div>
+          <div
+            style={{
+              height: "calc(90vh - 40px)",
+              overflowY: "scroll",
+            }}
+          >
+            {props.holds?.map((hold: IHold, index: number) => (
+              <div
                 style={{
-                  padding: "12px",
-                  border: "1px solid black",
-                  textAlign: "center",
+                  display: "flex",
+                  justifyContent: "space-around",
+                  padding: "5px",
+                  borderRadius: "10px",
+                  fontSize: "10px",
                 }}
               >
-                {index + 1}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  border: "1px solid black",
-                  textAlign: "center",
-                }}
-              >
-                {hold.address}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  border: "1px solid black",
-                  textAlign: "center",
-                }}
-              >
-                {hold.position.lat}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  border: "1px solid black",
-                  textAlign: "center",
-                }}
-              >
-                {hold.position.lng}
-              </td>
-              <td
-                style={{
-                  padding: "12px",
-                  border: "1px solid black",
-                  textAlign: "center",
-                }}
-              >
-                <img
+                <div
                   style={{
-                    width: "90%",
-                    height: "auto",
-                    display: "block",
-                    margin: "0 auto",
-                    maxHeight: "100%",
-                    maxWidth: "100%",
-                    overflow: "hidden",
-                    objectFit: "cover",
+                    textAlign: "center",
+                    width: "15%",
                   }}
-                  alt={`Image ${hold._id}`}
-                  src={`${API_BASE_URL}/holds/img?pathImg=${hold.path}`} // must change to your ip
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                >
+                  <h1>{index + 1}</h1>
+                </div>
+                <div
+                  style={{
+                    textAlign: "center",
+                    width: "17.5%",
+                  }}
+                >
+                  <h1>{hold.position.lat}</h1>
+                </div>
+                <div
+                  style={{
+                    textAlign: "center",
+                    width: "17.5%",
+                  }}
+                >
+                  <h1>{hold.position.lng}</h1>
+                </div>
+                <div
+                  style={{
+                    textAlign: "center",
+                    width: "20%",
+                  }}
+                  // onClick={() => handleChangeRole(user._id, user.role)}
+                >
+                  <h1
+                    style={{
+                      // color:
+                      //   user.role === UserRole.ADMIN ? "#bfb23b" : "#000000",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {hold.address}
+                  </h1>
+                </div>
+                <div
+                  style={{
+                    textAlign: "center",
+                    width: "30%",
+                  }}
+                  // onClick={() => handleChangeStatus(user._id, user.status)}
+                >
+                  <img
+                    style={{
+                      minWidth: "330px",
+                      maxWidth: "1250px",
+                      width: "100%",
+                      height: "100%",
+                      overflow: "hidden",
+                      objectFit: "contain",
+                    }}
+                    alt={`Image ${hold._id}`}
+                    src={`${API_BASE_URL}/holds/img?pathImg=${hold.path}`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

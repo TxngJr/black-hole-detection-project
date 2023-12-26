@@ -103,7 +103,7 @@ function RegisterPage() {
                 fontSize: "32px",
               }}
             >
-              username
+              Username
             </p>
             <input
               style={{
@@ -195,6 +195,12 @@ function RegisterPage() {
               }
             />
             <button
+              disabled={
+                userForm.username.length < 8 ||
+                userForm.government.length < 5 ||
+                userForm.password.length < 8 ||
+                userForm.password !== userForm.confirmPassword
+              }
               style={{
                 display: "block",
                 margin: "0 auto",
@@ -205,6 +211,7 @@ function RegisterPage() {
                 textAlign: "center",
                 fontSize: "32px",
                 marginBottom: "3%",
+                cursor: "pointer",
               }}
               onClick={handleSubmit}
             >
@@ -223,16 +230,19 @@ function RegisterPage() {
                 marginRight: "1%",
               }}
             >
-              You don’t have an account yet?
+              Already have an account?
             </p>
             <button
               style={{
                 color: "#59AFED",
                 fontSize: "20px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
               onClick={() => navigate("/login")}
             >
-              Register here
+              Login here
             </button>
           </div>
         </div>
@@ -276,6 +286,7 @@ function RegisterPage() {
               style={{
                 marginLeft: "1%",
                 fontSize: "24px",
+                whiteSpace: "nowrap",
               }}
             >
               แผนกวิชาเทคโนโลยีคอมพิวเตอร์ วิทยาลัยเทคนิคอุบลราชธานี

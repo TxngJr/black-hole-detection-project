@@ -1,20 +1,21 @@
-import React,{ useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import {
   deleteUserApi,
   fetchUsersApi,
+  updateRoleUserApi,
   updateStatusUserApi,
 } from "../services/user.service";
-import {
-  IUser,
-  UserStatus,
-} from "../interfaces/user.interface";
+import { IUser, UserRole, UserStatus } from "../interfaces/user.interface";
 import { ApiResponse } from "../interfaces/gobal.interface";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
 function DashBoard() {
   const { user } = useContext(AuthContext);
   const [listUsers, setListUsers] = useState<IUser[]>();
   const [error, setError] = useState<string>("");
+
+  const navigate: NavigateFunction = useNavigate();
 
   const fetchUsers = async () => {
     const response: ApiResponse<IUser> = await fetchUsersApi(user!.token);
@@ -29,6 +30,18 @@ function DashBoard() {
     const response: ApiResponse<IUser> = await updateStatusUserApi({
       _id,
       status: stautsChange,
+      token: user!.token,
+    });
+    if (!response.status) {
+      return setError("เกิดข้อผิดพลาด");
+    }
+    return fetchUsers();
+  };
+  const handleChangeRole = async (_id: string, role: UserRole) => {
+    const roleChange = role === UserRole.ADMIN ? UserRole.USER : UserRole.ADMIN;
+    const response: ApiResponse<IUser> = await updateRoleUserApi({
+      _id,
+      role: roleChange,
       token: user!.token,
     });
     if (!response.status) {
@@ -55,138 +68,208 @@ function DashBoard() {
     return () => clearInterval(interval);
   }, []);
 
-
   return (
-    // <div>
-    //   <h1>DashBoard</h1>
-    //   <h2>{error}</h2>
-    //   {listUsers?.map((user: IUser) => (
-    //     <div key={user._id}>
-    //       <h3>{user.username}</h3>
-    //       <h3>{user.government}</h3>
-    //       <h3>{user.role}</h3>
-    //       <button onClick={() => handleChangeStatus(user._id, user.status)}>
-    //         {user.status}
-    //       </button>
-    //       <button onClick={() => handleDelete(user._id)}>delete</button>
-    //     </div>
-    //   ))}
-    // </div>
-
     <div
-    style={{
-      position: "absolute",
-      top: "20px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      overflowY: "scroll",
-      height: "calc(100vh - 40px)",
-    }}
-  >
-    <table
       style={{
-        // width: '100%',
-        borderCollapse: "collapse",
-        display: "inline-table",
-        border: "1px solid black",
-        backgroundColor: "#FFFF",
+        position: "absolute",
+        left: "0",
+        right: "0",
+        top: "0",
+        bottom: "0",
+        background: "linear-gradient(180deg, #86DCAD 50%, #E9F191 100%)",
+        padding: "2%",
       }}
     >
-      <thead>
-        <tr style={{ backgroundColor: "#03adfc" }}>
-          <th
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          background: "#FFFFFF",
+          borderRadius: "50px",
+          width: "100%",
+          height: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          onClick={() => window.history.back()}
+          style={{
+            position: "absolute",
+            top: "1%",
+            left: "1%",
+            cursor: "pointer",
+          }}
+        >
+          <h1>Go back</h1>
+        </div>
+        <div
+          onClick={() => navigate("/home")}
+          style={{
+            position: "absolute",
+            top: "1%",
+            right: "1%",
+            cursor: "pointer",
+          }}
+        >
+          <h1>Go to map</h1>
+        </div>
+        <div
+          style={{
+            width: "90%",
+            height: "80%",
+            borderRadius: "20px",
+            background: "linear-gradient(180deg, #86DCAD 50%, #E9F191 100%)",
+            display: "block",
+          }}
+        >
+          <h1
             style={{
-              fontSize: "24px",
-              padding: "12px",
-              border: "1px solid black",
               textAlign: "center",
+              fontSize: "48px",
             }}
           >
-            number
-          </th>
-          <th
+            Hello {user?.username} !
+          </h1>
+          <div
             style={{
-              fontSize: "24px",
-              padding: "12px",
-              border: "1px solid black",
-              textAlign: "center",
+              display: "block",
+              justifyContent: "center",
+              padding: "1%",
             }}
           >
-            username
-          </th>
-          <th
-            style={{
-              fontSize: "24px",
-              padding: "12px",
-              border: "1px solid black",
-              textAlign: "center",
-            }}
-          >
-            role
-          </th>
-          <th
-            style={{
-              fontSize: "24px",
-              padding: "12px",
-              border: "1px solid black",
-              textAlign: "center",
-            }}
-          >
-            status
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {listUsers?.map((user: IUser, index: any) => (
-          <tr
-            key={index}
-            style={{
-              backgroundColor: index % 2 === 0 ? "#f2f2f2" : "transparent",
-              color: "#000000",
-            }}
-          >
-            <td
+            <div
               style={{
-                padding: "12px",
-                border: "1px solid black",
-                textAlign: "center",
+                display: "flex",
+                justifyContent: "space-around",
+                background: "#FFFFFF",
+                padding: "10px",
+                borderRadius: "10px",
               }}
             >
-              {index + 1}
-            </td>
-            <td
+              <div
+                style={{
+                  textAlign: "center",
+                  width: "100%",
+                }}
+              >
+                <h1>number</h1>
+              </div>
+              <div
+                style={{
+                  textAlign: "center",
+                  width: "100%",
+                }}
+              >
+                <h1>username</h1>
+              </div>
+              <div
+                style={{
+                  textAlign: "center",
+                  width: "100%",
+                }}
+              >
+                <h1>government</h1>
+              </div>
+              <div
+                style={{
+                  textAlign: "center",
+                  width: "100%",
+                }}
+              >
+                <h1>role</h1>
+              </div>
+              <div
+                style={{
+                  textAlign: "center",
+                  width: "100%",
+                }}
+              >
+                <h1>status</h1>
+              </div>
+            </div>
+            <div
               style={{
-                padding: "12px",
-                border: "1px solid black",
-                textAlign: "center",
+                height: "calc(60vh - 40px)",
+                overflowY: "scroll",
               }}
             >
-              {user.username}
-            </td>
-            <td
-              style={{
-                padding: "12px",
-                border: "1px solid black",
-                textAlign: "center",
-              }}
-            >
-              {user.role}
-            </td>
-            <td
-              style={{
-                padding: "12px",
-                border: "1px solid black",
-                textAlign: "center",
-              }}
-              onClick={() => handleChangeStatus(user._id, user.status)}
-            >
-               {user.status}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+              {listUsers?.map((user: IUser, index: any) => (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-around",
+                    padding: "5px",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      textAlign: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <h1>{index + 1}</h1>
+                  </div>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <h1>{user.username}</h1>
+                  </div>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <h1>{user.government}</h1>
+                  </div>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      width: "100%",
+                    }}
+                    onClick={() => handleChangeRole(user._id, user.role)}
+                  >
+                    <h1
+                      style={{
+                        color:
+                          user.role === UserRole.ADMIN ? "#bfb23b" : "#000000",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {user.role}
+                    </h1>
+                  </div>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      width: "100%",
+                    }}
+                    onClick={() => handleChangeStatus(user._id, user.status)}
+                  >
+                    <h1
+                      style={{
+                        color:
+                          user.status === UserStatus.ACTIVE
+                            ? "#00B051"
+                            : "#F00",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {user.status}
+                    </h1>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
