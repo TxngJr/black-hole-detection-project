@@ -44,6 +44,7 @@ function HomePage() {
   };
 
   useEffect(() => {
+    fetchHolds();
     const interval = setInterval(() => {
       fetchHolds();
     }, 3000);
@@ -132,8 +133,8 @@ function HomePage() {
               <div
                 style={{
                   position: "absolute",
-                  bottom: "2.5%",
-                  right: "7%",
+                  bottom: "8%",
+                  right: "6%",
                 }}
               >
                 <button
@@ -141,10 +142,10 @@ function HomePage() {
                     display: "block",
                     borderRadius: "50px",
                     background: "#f44336",
-                    width: "100px",
                     padding: "20%",
                     textAlign: "center",
                     fontSize: "24px",
+
                   }}
                   onClick={() => deleteHold(hold._id!)}
                 >

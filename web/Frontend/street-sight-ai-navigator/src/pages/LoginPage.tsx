@@ -167,6 +167,7 @@ function LoginPage() {
                 textAlign: "center",
                 fontSize: "32px",
                 marginBottom: "10%",
+                // border: "0px solid #FFFFFF",
               }}
               onClick={handleSubmit}
             >
