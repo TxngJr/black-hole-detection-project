@@ -7,6 +7,9 @@ interface Props {
 }
 
 export default function TableLatLng(props: Props) {
+  const downloadPDF = async () => {
+    window.open(API_BASE_URL + "/holds/img/pdf", "_blank");
+  };
   return (
     <div
       style={{
@@ -44,7 +47,28 @@ export default function TableLatLng(props: Props) {
           Close
         </button>
       </div>
-
+      <div
+        style={{
+          position: "absolute",
+          top: "2%",
+          right: "1%",
+        }}
+      >
+        <button
+          style={{
+            borderRadius: "50px",
+            background: "#e88615",
+            width: "150px",
+            padding: "6%",
+            textAlign: "center",
+            fontSize: "24px",
+            cursor: "pointer",
+          }}
+          onClick={downloadPDF}
+        >
+          Download
+        </button>
+      </div>
       <div
         style={{
           width: "90%",
@@ -156,24 +180,14 @@ export default function TableLatLng(props: Props) {
                     textAlign: "center",
                     width: "20%",
                   }}
-                  // onClick={() => handleChangeRole(user._id, user.role)}
                 >
-                  <h1
-                    style={{
-                      // color:
-                      //   user.role === UserRole.ADMIN ? "#bfb23b" : "#000000",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {hold.address}
-                  </h1>
+                  <h1>{hold.address}</h1>
                 </div>
                 <div
                   style={{
                     textAlign: "center",
                     width: "30%",
                   }}
-                  // onClick={() => handleChangeStatus(user._id, user.status)}
                 >
                   <img
                     style={{

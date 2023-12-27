@@ -34,5 +34,6 @@ router.delete(
 );
 
 router.get("/img", holdController.getHoldImg);
+router.get("/img/pdf", holdController.getPdfHolds);
 
 export default router;
