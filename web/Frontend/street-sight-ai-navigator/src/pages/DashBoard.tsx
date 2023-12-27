@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import {
   deleteUserApi,
@@ -13,14 +13,13 @@ import { NavigateFunction, useNavigate } from "react-router-dom";
 function DashBoard() {
   const { user } = useContext(AuthContext);
   const [listUsers, setListUsers] = useState<IUser[]>();
-  const [error, setError] = useState<string>("");
 
   const navigate: NavigateFunction = useNavigate();
 
   const fetchUsers = async () => {
     const response: ApiResponse<IUser> = await fetchUsersApi(user!.token);
     if (!response.status) {
-      setError("เกิดข้อผิดพลาด");
+      return;
     }
     return setListUsers(response.data);
   };
@@ -33,7 +32,7 @@ function DashBoard() {
       token: user!.token,
     });
     if (!response.status) {
-      return setError("เกิดข้อผิดพลาด");
+      return;
     }
     return fetchUsers();
   };
@@ -45,7 +44,7 @@ function DashBoard() {
       token: user!.token,
     });
     if (!response.status) {
-      return setError("เกิดข้อผิดพลาด");
+      return;
     }
     return fetchUsers();
   };
@@ -56,10 +55,11 @@ function DashBoard() {
       token: user!.token,
     });
     if (!response.status) {
-      return setError("เกิดข้อผิดพลาด");
+      return;
     }
-    return window.location.reload();
+    return fetchUsers();
   };
+
   useEffect(() => {
     fetchUsers();
     const interval = setInterval(() => {
@@ -208,6 +208,7 @@ function DashBoard() {
                       textAlign: "center",
                       width: "100%",
                     }}
+                    onClick={() => handleDelete(user._id)}
                   >
                     <h1>{index + 1}</h1>
                   </div>

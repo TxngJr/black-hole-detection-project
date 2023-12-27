@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { loginApi } from "../services/user.service";
 import {
@@ -18,14 +18,13 @@ function LoginPage() {
     username: "",
     password: "",
   });
-  const [error, setError] = useState<string>("");
 
   const navigate: NavigateFunction = useNavigate();
 
   const handleSubmit = async () => {
     const response: ApiResponse<IUser> = await loginApi(userForm);
     if (!response.status) {
-      return setError("username or password is incorrect");
+      return
     }
     saveUser(response.data.token);
     if (user?.status === UserStatus.INACTIVE) {

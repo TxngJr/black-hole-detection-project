@@ -1,8 +1,7 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { ApiResponse } from "../interfaces/gobal.interface";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import Button from "../components/Button";
 import TableLatLng from "../components/TableLatLng";
 import { deleteHoldApi, getHoldsApi } from "../services/hold.service";
 import { IHold } from "../interfaces/hold.interface";
@@ -34,14 +33,13 @@ function HomePage() {
   ]);
   const [hold, setHold] = useState<IHold | null>();
   const [table, setTable] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
 
   const navigate: NavigateFunction = useNavigate();
 
   const fetchHolds = async () => {
     const response: ApiResponse<IHold> = await getHoldsApi(user!.token);
     if (!response.status) {
-      setError("เกิดข้อผิดพลาด");
+      return
     }
     return setHolds(response.data);
   };
@@ -49,7 +47,7 @@ function HomePage() {
   const deleteHold = async (id: string) => {
     const response: ApiResponse<IHold> = await deleteHoldApi(id, user!.token);
     if (!response.status) {
-      setError("เกิดข้อผิดพลาด");
+      return
     }
     setHold(null);
     return fetchHolds();

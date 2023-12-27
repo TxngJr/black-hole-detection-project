@@ -2,7 +2,7 @@ import { registerApi } from "../services/user.service";
 import { IRegisterForm, IUser } from "../interfaces/user.interface";
 import { ApiResponse } from "../interfaces/gobal.interface";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import { useState } from "react";
 import imgJivt from "../assets/images/jivt.png";
 import imgUtc from "../assets/images/utc.png";
 import imgCt from "../assets/images/ct.png";
@@ -14,14 +14,13 @@ function RegisterPage() {
     confirmPassword: "",
     government: "",
   });
-  const [error, setError] = useState<string>("");
 
   const navigate: NavigateFunction = useNavigate();
 
   const handleSubmit = async () => {
     const response: ApiResponse<IUser> = await registerApi(userForm);
     if (!response.status) {
-      return setError("cannot register");
+      return
     }
     return navigate("/login");
   };

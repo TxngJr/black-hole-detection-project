@@ -1,72 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext} from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import {
-  deleteUserApi,
-  fetchUsersApi,
-  updateRoleUserApi,
-  updateStatusUserApi,
-} from "../services/user.service";
-import { IUser, UserRole, UserStatus } from "../interfaces/user.interface";
-import { ApiResponse } from "../interfaces/gobal.interface";
-import { NavigateFunction, useNavigate } from "react-router-dom";
 
 function WaitActivePage() {
   const { user } = useContext(AuthContext);
-  const [listUsers, setListUsers] = useState<IUser[]>();
-  const [error, setError] = useState<string>("");
-
-  const navigate: NavigateFunction = useNavigate();
-
-  const fetchUsers = async () => {
-    const response: ApiResponse<IUser> = await fetchUsersApi(user!.token);
-    if (!response.status) {
-      setError("เกิดข้อผิดพลาด");
-    }
-    return setListUsers(response.data);
-  };
-  const handleChangeStatus = async (_id: string, status: UserStatus) => {
-    const stautsChange =
-      status === UserStatus.ACTIVE ? UserStatus.INACTIVE : UserStatus.ACTIVE;
-    const response: ApiResponse<IUser> = await updateStatusUserApi({
-      _id,
-      status: stautsChange,
-      token: user!.token,
-    });
-    if (!response.status) {
-      return setError("เกิดข้อผิดพลาด");
-    }
-    return fetchUsers();
-  };
-  const handleChangeRole = async (_id: string, role: UserRole) => {
-    const roleChange = role === UserRole.ADMIN ? UserRole.USER : UserRole.ADMIN;
-    const response: ApiResponse<IUser> = await updateRoleUserApi({
-      _id,
-      role: roleChange,
-      token: user!.token,
-    });
-    if (!response.status) {
-      return setError("เกิดข้อผิดพลาด");
-    }
-    return fetchUsers();
-  };
-
-  const handleDelete = async (_id: string) => {
-    const response: ApiResponse<IUser> = await deleteUserApi({
-      _id,
-      token: user!.token,
-    });
-    if (!response.status) {
-      return setError("เกิดข้อผิดพลาด");
-    }
-    return window.location.reload();
-  };
-  useEffect(() => {
-    fetchUsers();
-    const interval = setInterval(() => {
-      fetchUsers();
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div
