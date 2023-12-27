@@ -142,7 +142,7 @@ const getPdfHolds = async (req: Request, res: Response) => {
     
   pdf.create(html).toStream(async (err, stream) => {
     res.setHeader("Content-Type", "application/pdf");
-    // res.setHeader("Content-Disposition", "attachment; filename=report.pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=report.pdf");
 
     stream.pipe(res);
   });
