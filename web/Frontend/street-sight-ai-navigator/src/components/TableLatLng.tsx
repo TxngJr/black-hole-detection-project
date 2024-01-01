@@ -8,7 +8,7 @@ interface Props {
 
 export default function TableLatLng(props: Props) {
   const downloadPDF = async () => {
-    window.open(API_BASE_URL + "/holds/img/pdf", "_blank");
+    return window.open("/pdf", "_blank");
   };
   return (
     <div

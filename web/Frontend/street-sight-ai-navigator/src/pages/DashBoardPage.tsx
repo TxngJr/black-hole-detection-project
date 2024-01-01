@@ -10,7 +10,7 @@ import { IUser, UserRole, UserStatus } from "../interfaces/user.interface";
 import { ApiResponse } from "../interfaces/gobal.interface";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 
-function DashBoard() {
+function DashBoardPage() {
   const { user } = useContext(AuthContext);
   const [listUsers, setListUsers] = useState<IUser[]>();
 
@@ -274,4 +274,4 @@ function DashBoard() {
   );
 }
 
-export default DashBoard;
+export default DashBoardPage;
