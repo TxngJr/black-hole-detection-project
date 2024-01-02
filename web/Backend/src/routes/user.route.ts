@@ -32,4 +32,18 @@ router.delete(
 router.post("/register", userController.register);
 router.post("/login", userController.login);
 
+router.get(
+  "/get-owner",
+  authMiddleware.authenticateToken,
+  roleMiddleware.checkAccessPermissionAdmin,
+  userController.getOwnerCanUse
+);
+
+router.post(
+  "/add-owner-user",
+  authMiddleware.authenticateToken,
+  roleMiddleware.checkAccessPermissionAdmin,
+  userController.changeOwner
+);
+
 export default router;
