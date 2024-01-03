@@ -1,10 +1,10 @@
 export interface IHold {
-  _id?: string;
+  _id: string | any;
   path: string;
   position: {
     lat: number;
     lng: number;
   };
   address: string;
-  macAddress: string;
+  _machineId: string | any;
 }

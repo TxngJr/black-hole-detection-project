@@ -24,7 +24,7 @@ function LoginPage() {
   const handleSubmit = async () => {
     const response: ApiResponse<IUser> = await loginApi(userForm);
     if (!response.status) {
-      return
+      return;
     }
     saveUser(response.data.token);
     if (user?.status === UserStatus.INACTIVE) {
@@ -136,7 +136,7 @@ function LoginPage() {
                 fontSize: "32px",
               }}
             >
-            Password
+              Password
             </p>
             <input
               style={{
@@ -168,6 +168,9 @@ function LoginPage() {
                 marginBottom: "10%",
                 cursor: "pointer",
               }}
+              disabled={
+                userForm.username.length < 8 || userForm.password.length < 8
+              }
               onClick={handleSubmit}
             >
               Login
@@ -207,7 +210,7 @@ function LoginPage() {
             bottom: "0",
             left: "0",
           }}
-          >
+        >
           <div
             style={{
               position: "relative",

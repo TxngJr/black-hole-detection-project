@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 
 export interface IUser {
-  _id?: string;
+  _id: string | any;
   username: string;
   hashPassword?: string;
-  government: string;
   role: UserRole;
   status: UserStatus;
+  _governmentId: string | any;
 }
 
 export interface RequestAndUser extends Request {

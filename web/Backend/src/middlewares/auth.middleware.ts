@@ -5,6 +5,7 @@ import {
   NextFunctionAndUser,
   RequestAndUser,
   ResponseAndUser,
+  UserRole,
 } from "../interfaces/user.interface";
 import dotenv from "dotenv";
 import UserModel from "../models/user.model";
@@ -16,32 +17,38 @@ const authenticateToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
 
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  jwt.verify(
-    token,
-    process.env.JWT_SECRET!,
-    async (
-      err: jwt.VerifyErrors | null,
-      decode: { _id: string } | any
-    ): Promise<NextFunctionAndUser | ResponseAndUser | any> => {
-      if (err) {
-        return res.status(403).json({ message: "Token is expired" });
-      }
-      let user: IUser | null = await UserModel.findById(decode._id);
-      if (!user) {
-        return res.status(403).json({ message: "User Not Found" });
-      }
-      delete user.hashPassword;
-      req.user = user;
-      next();
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
-  );
+
+    jwt.verify(
+      token,
+      process.env.JWT_SECRET!,
+      async (
+        err: jwt.VerifyErrors | null,
+        decode: { _id: string } | any
+      ): Promise<NextFunctionAndUser | ResponseAndUser | any> => {
+        if (err) {
+          return res.status(403).json({ message: "Token is expired" });
+        }
+        let findUser: IUser | null = await UserModel.findById(
+          decode._id
+        ).populate("_governmentId");
+        if (!findUser) {
+          return res.status(403).json({ message: "User Not Found" });
+        }
+        findUser.hashPassword = undefined;
+        req.user = findUser;
+        next();
+      }
+    );
+  } catch (err) {
+    return res.status(400).json({ message: "Have Something Wrong" });
+  }
 };
 
 export default { authenticateToken };

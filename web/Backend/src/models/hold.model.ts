@@ -8,7 +8,7 @@ const HoldSchema: Schema = new Schema({
         lng: { type: Number, required: true },
     },
     address: { type: String },
-    macAddress: { type: String, required: true },
+    _machineId: { type: mongoose.Schema.Types.ObjectId, ref: 'Machine', required: true },
 });
 
 const HoldModel = mongoose.model<IHold>('Hold', HoldSchema);

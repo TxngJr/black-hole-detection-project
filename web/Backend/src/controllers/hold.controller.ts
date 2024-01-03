@@ -4,12 +4,15 @@ import HoldModel from "../models/hold.model";
 import { IHold } from "../interfaces/hold.interface";
 import path from "path";
 import fs from "fs";
+import { RequestAndUser, UserRole } from "../interfaces/user.interface";
+import GovernmentModel from "../models/government.model";
+import { IGovernment } from "../interfaces/government.interface";
 dotenv.config();
 
 const createHold = async (req: Request, res: Response) => {
   try {
     const { originalname } = req.file!;
-    const { macAddress } = req.body;
+    const { _machineId } = req.body;
 
     let arraryLatLog: Array<string> = originalname.split(", ");
     if (Number(arraryLatLog[0]) == 0) {
@@ -34,7 +37,7 @@ const createHold = async (req: Request, res: Response) => {
         lng: Number(arraryLatLog[1]),
       },
       address,
-      macAddress,
+      _machineId,
     });
     if (!holdCreate) {
       return res.status(404).json({ message: "Fail to register" });
@@ -45,10 +48,24 @@ const createHold = async (req: Request, res: Response) => {
   }
 };
 
-const getHolds = async (req: Request, res: Response) => {
+const getHolds = async (req: RequestAndUser, res: Response) => {
   try {
-    const holds: IHold[] | null = await HoldModel.find({});
-    return res.status(200).json(holds);
+    const { role, _governmentId } = req.user!;
+    const findGovernment: IGovernment | null = await GovernmentModel.findById({
+      _id: _governmentId,
+    });
+    if (!findGovernment) {
+      return res.status(400).json({ message: "Government not found" });
+    }
+    if (role === UserRole.SUPERADMIN) {
+      const findHolds: IHold[] | null = await HoldModel.find();
+      return res.status(200).json(findHolds);
+    } else {
+      const findHolds: IHold[] | null = await HoldModel.find({
+        _machineId: { $in: findGovernment._machineListId },
+      });
+      return res.status(200).json(findHolds);
+    }
   } catch (err) {
     return res.status(400).json({ message: "Have Something Wrong" });
   }

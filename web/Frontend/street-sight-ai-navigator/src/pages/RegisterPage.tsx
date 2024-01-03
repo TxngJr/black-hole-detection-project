@@ -2,10 +2,12 @@ import { registerApi } from "../services/user.service";
 import { IRegisterForm, IUser } from "../interfaces/user.interface";
 import { ApiResponse } from "../interfaces/gobal.interface";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import imgJivt from "../assets/images/jivt.png";
 import imgUtc from "../assets/images/utc.png";
 import imgCt from "../assets/images/ct.png";
+import { IGovernment } from "../interfaces/government.interface";
+import { getGovernmentApi } from "../services/government.service";
 
 function RegisterPage() {
   const [userForm, setUserForm] = useState<IRegisterForm>({
@@ -14,16 +16,34 @@ function RegisterPage() {
     confirmPassword: "",
     government: "",
   });
+  const [listGovernment, setListGovernment] = useState<IGovernment[]>([]);
+  const [isGovernment, setIsGovernment] = useState<boolean>(false);
 
   const navigate: NavigateFunction = useNavigate();
 
   const handleSubmit = async () => {
     const response: ApiResponse<IUser> = await registerApi(userForm);
     if (!response.status) {
-      return
+      return;
     }
     return navigate("/login");
   };
+
+  const fetchGovernments = async () => {
+    const response: ApiResponse<{ _id: string; government: string }> =
+      await getGovernmentApi();
+    if (!response.status) {
+      return;
+    }
+    return setListGovernment(response.data);
+  };
+  useEffect(() => {
+    fetchGovernments();
+    const interval = setInterval(() => {
+      fetchGovernments();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div
@@ -128,23 +148,61 @@ function RegisterPage() {
             >
               Government
             </p>
-            <input
-              style={{
-                width: "100%",
-                borderRadius: "20px",
-                background: "#FFFFFF",
-                border: "0px solid #FFFFFF",
-                boxSizing: "border-box",
-                fontSize: "24px",
-                padding: "2% 5%",
-                marginBottom: "2%",
-              }}
-              type="text"
-              value={userForm.government}
-              onChange={(e) =>
-                setUserForm({ ...userForm, government: e.target.value })
-              }
-            />
+            {isGovernment ? (
+              <input
+                style={{
+                  width: "100%",
+                  borderRadius: "20px",
+                  background: "#FFFFFF",
+                  border: "0px solid #FFFFFF",
+                  boxSizing: "border-box",
+                  fontSize: "24px",
+                  padding: "2% 5%",
+                  marginBottom: "2%",
+                }}
+                type="text"
+                value={userForm.government}
+                onChange={(e) => {
+                  setUserForm({ ...userForm, government: e.target.value });
+                  if (!e.target.value) {
+                    setIsGovernment(false);
+                  }
+                }}
+              />
+            ) : (
+              <select
+                style={{
+                  width: "100%",
+                  borderRadius: "20px",
+                  background: "#FFFFFF",
+                  border: "0px solid #FFFFFF",
+                  boxSizing: "border-box",
+                  fontSize: "24px",
+                  padding: "2% 5%",
+                  marginBottom: "2%",
+                }}
+                onChange={(e) => {
+                  setUserForm({ ...userForm, government: e.target.value });
+                  if (!e.target.value) {
+                    setIsGovernment(true);
+                  }
+                }}
+              >
+                {listGovernment.map(
+                  (government: IGovernment, index: number) => (
+                    <option
+                      key={government._id}
+                      value={government._id}
+                      selected={index === 0 && true}
+                    >
+                      {government.name}
+                    </option>
+                  )
+                )}
+                <option value="">create Government</option>
+              </select>
+            )}
+
             <p
               style={{
                 fontSize: "32px",
@@ -196,9 +254,9 @@ function RegisterPage() {
             <button
               disabled={
                 userForm.username.length < 8 ||
-                userForm.government.length < 5 ||
                 userForm.password.length < 8 ||
-                userForm.password !== userForm.confirmPassword
+                userForm.password !== userForm.confirmPassword ||
+                userForm.government.length < 10
               }
               style={{
                 display: "block",

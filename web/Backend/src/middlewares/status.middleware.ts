@@ -1,8 +1,5 @@
 import { NextFunction, Response } from "express";
 import { RequestAndUser, UserStatus } from "../interfaces/user.interface";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const checkAccessPermissionActive = async (
   req: RequestAndUser,
@@ -12,7 +9,7 @@ const checkAccessPermissionActive = async (
   const { status } = req.user!;
 
   if (status === UserStatus.INACTIVE) {
-    return res.status(400).json({ message: "You can use This Service" });
+    return res.status(400).json({ message: "You can't use This Service" });
   }
 
   next();

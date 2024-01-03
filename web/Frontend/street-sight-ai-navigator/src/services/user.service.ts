@@ -98,7 +98,7 @@ export const updateStatusUserApi = async (data: {
       API_BASE_URL +
         `/users/change-status-user?_id=${data._id}&status=${data.status}`,
       {
-        method: "GET",
+        method: "PUT",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -131,7 +131,7 @@ export const updateRoleUserApi = async (data: {
       API_BASE_URL +
         `/users/change-role-user?_id=${data._id}&role=${data.role}`,
       {
-        method: "GET",
+        method: "PUT",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",

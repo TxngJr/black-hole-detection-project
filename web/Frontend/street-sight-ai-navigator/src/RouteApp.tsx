@@ -14,27 +14,31 @@ function RouteApp() {
   const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
-      setTimeout(() => {
-        setAuthLoaded(true);
-      }, 50);
+    setTimeout(() => {
+      setAuthLoaded(true);
+    }, 50);
   }, []);
 
   if (!authLoaded) {
-    return <div
-    style={{
-      position: "absolute",
-      left: "0",
-      right: "0",
-      top: "0",
-      bottom: "0",
-      padding: "0 5%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-    >Loading...</div>;
+    return (
+      <div
+        style={{
+          position: "absolute",
+          left: "0",
+          right: "0",
+          top: "0",
+          bottom: "0",
+          padding: "0 5%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
-  
+
   return (
     <BrowserRouter>
       <Routes>
@@ -43,9 +47,7 @@ function RouteApp() {
             <>
               <Route path="/home" element={<HomePage />} />
               <Route path="/pdf" element={<PdfHoldPage />} />
-              {user.role == UserRole.ADMIN && (
-                <Route path="/dashboard" element={<DashBoard />} />
-              )}
+              <Route path="/dashboard" element={<DashBoard />} />
               <Route path="*" element={<Navigate to="/home" />} />
             </>
           ) : (

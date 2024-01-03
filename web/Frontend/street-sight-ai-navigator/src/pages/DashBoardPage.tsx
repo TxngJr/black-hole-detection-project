@@ -9,10 +9,13 @@ import {
 import { IUser, UserRole, UserStatus } from "../interfaces/user.interface";
 import { ApiResponse } from "../interfaces/gobal.interface";
 import { NavigateFunction, useNavigate } from "react-router-dom";
+import { addMacAddressApi, dropMacAddressApi } from "../services/government.service";
+import { fetchOwnerCanUseApi } from "../services/machine.service";
 
 function DashBoardPage() {
   const { user } = useContext(AuthContext);
   const [listUsers, setListUsers] = useState<IUser[]>();
+  const [listOwner, setListOwner] = useState<Array<string>>();
 
   const navigate: NavigateFunction = useNavigate();
 
@@ -21,8 +24,10 @@ function DashBoardPage() {
     if (!response.status) {
       return;
     }
+    fetchOwners();
     return setListUsers(response.data);
   };
+
   const handleChangeStatus = async (_id: string, status: UserStatus) => {
     const stautsChange =
       status === UserStatus.ACTIVE ? UserStatus.INACTIVE : UserStatus.ACTIVE;
@@ -34,8 +39,10 @@ function DashBoardPage() {
     if (!response.status) {
       return;
     }
+    fetchOwners();
     return fetchUsers();
   };
+
   const handleChangeRole = async (_id: string, role: UserRole) => {
     const roleChange = role === UserRole.ADMIN ? UserRole.USER : UserRole.ADMIN;
     const response: ApiResponse<IUser> = await updateRoleUserApi({
@@ -46,6 +53,7 @@ function DashBoardPage() {
     if (!response.status) {
       return;
     }
+    fetchOwners();
     return fetchUsers();
   };
 
@@ -57,13 +65,52 @@ function DashBoardPage() {
     if (!response.status) {
       return;
     }
+    fetchOwners();
     return fetchUsers();
+  };
+
+  const handleAddMacAddress = async (_id: string, macAddress: string) => {
+    const response: ApiResponse<any> = await addMacAddressApi({
+      _id,
+      macAddress,
+      token: user!.token,
+    });
+    if (!response.status) {
+      return;
+    }
+    fetchOwners();
+    return fetchUsers();
+  };
+
+  const handleDropMacAddress = async (_id: string, macAddress: string) => {
+    const response: ApiResponse<any> = await dropMacAddressApi({
+      _id,
+      macAddress,
+      token: user!.token,
+    });
+    if (!response.status) {
+      return;
+    }
+    fetchOwners();
+    return fetchUsers();
+  };
+
+  const fetchOwners = async () => {
+    const response: ApiResponse<{ _id: string; government: string }> =
+      await fetchOwnerCanUseApi(user!.token);
+    if (!response.status) {
+      return;
+    }
+    fetchUsers();
+    return setListOwner(response.data);
   };
 
   useEffect(() => {
     fetchUsers();
+    fetchOwners();
     const interval = setInterval(() => {
       fetchUsers();
+      fetchOwners();
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -185,6 +232,14 @@ function DashBoardPage() {
                   width: "100%",
                 }}
               >
+                <h1>pi machine</h1>
+              </div>
+              <div
+                style={{
+                  textAlign: "center",
+                  width: "100%",
+                }}
+              >
                 <h1>status</h1>
               </div>
             </div>
@@ -194,7 +249,7 @@ function DashBoardPage() {
                 overflowY: "scroll",
               }}
             >
-              {listUsers?.map((user: IUser, index: any) => (
+              {listUsers?.map((listUser: IUser, index: any) => (
                 <div
                   style={{
                     display: "flex",
@@ -208,7 +263,7 @@ function DashBoardPage() {
                       textAlign: "center",
                       width: "100%",
                     }}
-                    onClick={() => handleDelete(user._id)}
+                    onClick={() => handleDelete(listUser._id)}
                   >
                     <h1>{index + 1}</h1>
                   </div>
@@ -218,7 +273,7 @@ function DashBoardPage() {
                       width: "100%",
                     }}
                   >
-                    <h1>{user.username}</h1>
+                    <h1>{listUser.username}</h1>
                   </div>
                   <div
                     style={{
@@ -226,23 +281,23 @@ function DashBoardPage() {
                       width: "100%",
                     }}
                   >
-                    <h1>{user.government}</h1>
+                    <h1>{user?.role === UserRole.SUPERADMIN ? listUser._governmentId.name: user?._governmentId.name}</h1>
                   </div>
                   <div
                     style={{
                       textAlign: "center",
                       width: "100%",
                     }}
-                    onClick={() => handleChangeRole(user._id, user.role)}
+                    onClick={() => handleChangeRole(listUser._id, listUser.role)}
                   >
                     <h1
                       style={{
                         color:
-                          user.role === UserRole.ADMIN ? "#bfb23b" : "#000000",
+                        listUser.role === UserRole.ADMIN ? "#bfb23b" : "#000000",
                         cursor: "pointer",
                       }}
                     >
-                      {user.role}
+                      {listUser.role}
                     </h1>
                   </div>
                   <div
@@ -250,18 +305,70 @@ function DashBoardPage() {
                       textAlign: "center",
                       width: "100%",
                     }}
-                    onClick={() => handleChangeStatus(user._id, user.status)}
+                    // onClick={() => handleChangeRole(user._id, user.role)}
+                  >
+                    {/* {user.role === UserRole.ADMIN && (
+                      <select
+                        style={{
+                          width: "100%",
+                          borderRadius: "20px",
+                          background: "#FFFFFF",
+                          border: "0px solid #FFFFFF",
+                          boxSizing: "border-box",
+                          fontSize: "24px",
+                          padding: "2% 5%",
+                          marginBottom: "2%",
+                        }}
+                        value={"List pi machine"}
+                        onChange={(e) => {
+                          if (user.owner?.includes(e.target.value)) {
+                            handleDropMacAddress(user._id, e.target.value);
+                          } else if (listOwner?.includes(e.target.value)) {
+                            handleAddMacAddress(user._id, e.target.value);
+                          } else {
+                            user.owner = [];
+                          }
+                        }}
+                      >
+                        <option value="" selected={true}>
+                          Add pi machine
+                        </option>
+                        {user.owner?.map((owner) => (
+                          <option
+                            style={{
+                              color: "red",
+                            }}
+                            key={owner}
+                            value={owner}
+                          >
+                            {owner}
+                          </option>
+                        ))}
+                        {listOwner?.map((owner) => (
+                          <option key={owner} value={owner}>
+                            {owner}
+                          </option>
+                        ))}
+                      </select>
+                    )} */}
+                  </div>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      width: "100%",
+                    }}
+                    onClick={() => handleChangeStatus(listUser._id, listUser.status)}
                   >
                     <h1
                       style={{
                         color:
-                          user.status === UserStatus.ACTIVE
+                        listUser.status === UserStatus.ACTIVE
                             ? "#00B051"
                             : "#F00",
                         cursor: "pointer",
                       }}
                     >
-                      {user.status}
+                      {listUser.status}
                     </h1>
                   </div>
                 </div>

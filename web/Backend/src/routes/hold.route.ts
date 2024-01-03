@@ -4,6 +4,7 @@ import multer from "multer";
 import authMiddleware from "../middlewares/auth.middleware";
 import roleMiddleware from "../middlewares/role.middleware";
 import statusMiddleware from "../middlewares/status.middleware";
+import accessHoldMiddleware from "../middlewares/accessHoldByGovertnment.middleware";
 const path = require("path");
 
 const storage = multer.diskStorage({
@@ -30,6 +31,7 @@ router.delete(
   "/",
   authMiddleware.authenticateToken,
   roleMiddleware.checkAccessPermissionAdmin,
+  accessHoldMiddleware.accessHold,
   holdController.deleteHold
 );
 

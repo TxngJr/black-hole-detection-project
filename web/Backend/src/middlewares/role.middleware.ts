@@ -1,8 +1,5 @@
 import { NextFunction, Response } from "express";
 import { RequestAndUser, UserRole } from "../interfaces/user.interface";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const checkAccessPermissionAdmin = async (
   req: RequestAndUser,
@@ -14,8 +11,20 @@ const checkAccessPermissionAdmin = async (
   if (role === UserRole.USER) {
     return res.status(400).json({ message: "This service for admin" });
   }
-
   next();
 };
 
-export default { checkAccessPermissionAdmin };
+const checkAccessPermissionSuperAdmin = async (
+  req: RequestAndUser,
+  res: Response,
+  next: NextFunction
+) => {
+  const { role } = req.user!;
+
+  if (role !== UserRole.SUPERADMIN) {
+    return res.status(400).json({ message: "This service for superadmin" });
+  }
+  next();
+};
+
+export default { checkAccessPermissionAdmin, checkAccessPermissionSuperAdmin };

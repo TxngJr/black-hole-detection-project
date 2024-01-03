@@ -52,7 +52,7 @@ function PdfHoldPage() {
             style={{
               flexDirection: "row",
               justifyContent: "space-around",
-              backgroundColor: "#04AA6D",
+              backgroundColor: "#F1F1F1",
               textAlign: "center",
             }}
           >
@@ -109,12 +109,14 @@ function PdfHoldPage() {
                 flexDirection: "row",
                 backgroundColor: index % 2 == 0 ? "#FFFFFF" : "#F1F1F1",
                 textAlign: "center",
-                paddingVertical: 5,
+                marginTop:index == 14 ? 25 : 0,
               }}
-            >
+              >
               <View
                 style={{
                   flex: 1,
+                  paddingVertical: 5,
+                  border: "1px solid black",
                 }}
               >
                 <Text>{index + 1}</Text>
@@ -122,6 +124,8 @@ function PdfHoldPage() {
               <View
                 style={{
                   flex: 2,
+                  paddingVertical: 5,
+                  border: "1px solid black",
                 }}
               >
                 <Text>{hold.position.lat}</Text>
@@ -129,6 +133,8 @@ function PdfHoldPage() {
               <View
                 style={{
                   flex: 2,
+                  paddingVertical: 5,
+                  border: "1px solid black",
                 }}
               >
                 <Text>{hold.position.lng}</Text>
@@ -136,6 +142,8 @@ function PdfHoldPage() {
               <View
                 style={{
                   flex: 6,
+                  paddingVertical: 5,
+                  border: "1px solid black",
                 }}
               >
                 <Text>{hold.address}</Text>
@@ -143,6 +151,8 @@ function PdfHoldPage() {
               <View
                 style={{
                   flex: 5,
+                  paddingVertical: 5,
+                  border: "1px solid black",
                 }}
               >
                 <Image

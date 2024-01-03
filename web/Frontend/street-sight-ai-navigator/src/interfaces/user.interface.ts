@@ -1,9 +1,12 @@
+import { IGovernment } from "./government.interface";
+
 export interface IUser {
-  _id: string;
+  _id: string | any;
   username: string;
-  government: string;
+  hashPassword?: string;
   role: UserRole;
   status: UserStatus;
+  _governmentId: IGovernment | string | any;
   token: string;
 }
 
@@ -28,6 +31,7 @@ export interface ILoginApiRequestAndForm {
 export enum UserRole {
   USER = "user",
   ADMIN = "admin",
+  SUPERADMIN = "superadmin",
 }
 
 export enum UserStatus {

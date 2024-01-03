@@ -28,7 +28,7 @@ function HomePage() {
       position: { lat: 0, lng: 0 },
       address: "",
       path: "",
-      macAddress: "",
+      _machineId: "",
     },
   ]);
   const [hold, setHold] = useState<IHold | null>();
@@ -84,7 +84,6 @@ function HomePage() {
         }}
         onLoad={onLoad}
       >
-        {user?.role === UserRole.ADMIN && (
           <div
             style={{
               position: "absolute",
@@ -107,7 +106,6 @@ function HomePage() {
               Dashboard
             </button>
           </div>
-        )}
         <div
           style={{
             position: "absolute",
@@ -284,10 +282,10 @@ function HomePage() {
                       fontSize: "16px",
                     }}
                   >
-                    {hold.macAddress}
+                    {hold._machineId}
                   </h1>
                 </div>
-                {user?.role === UserRole.ADMIN && (
+                {(user!.role == UserRole.ADMIN || user!.role == UserRole.SUPERADMIN) && (
                   <button
                     style={{
                       position: "absolute",
