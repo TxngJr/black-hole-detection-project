@@ -21,9 +21,10 @@ const getMachineCanUse = async (req: Request, res: Response) => {
 const generateMachine = async (req: Request, res: Response) => {
   try {
     const { macAddress} = req.body;
+
     const findMachine: IMachine|null = await MachineModel.findOne({macAddress})
     if(findMachine){
-      return res.status(400).json(findMachine._id)
+      return res.status(200).json(findMachine._id)
     }
     const newMachine: IMachine|null = await MachineModel.create({macAddress})
     if(!newMachine){
