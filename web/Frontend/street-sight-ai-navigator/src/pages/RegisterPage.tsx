@@ -16,8 +16,9 @@ function RegisterPage() {
     confirmPassword: "",
     government: "",
   });
+  
   const [listGovernment, setListGovernment] = useState<IGovernment[]>([]);
-  const [isGovernment, setIsGovernment] = useState<boolean>(false);
+  const [isNewGovernment, setIsNewGovernment] = useState<boolean>(false);
 
   const navigate: NavigateFunction = useNavigate();
 
@@ -148,7 +149,7 @@ function RegisterPage() {
             >
               Government
             </p>
-            {isGovernment ? (
+            {isNewGovernment ? (
               <input
                 style={{
                   width: "100%",
@@ -165,7 +166,7 @@ function RegisterPage() {
                 onChange={(e) => {
                   setUserForm({ ...userForm, government: e.target.value });
                   if (!e.target.value) {
-                    setIsGovernment(false);
+                    setIsNewGovernment(false);
                   }
                 }}
               />
@@ -184,21 +185,18 @@ function RegisterPage() {
                 onChange={(e) => {
                   setUserForm({ ...userForm, government: e.target.value });
                   if (!e.target.value) {
-                    setIsGovernment(true);
+                    setIsNewGovernment(true);
                   }
                 }}
               >
-                {listGovernment.map(
-                  (government: IGovernment, index: number) => (
-                    <option
-                      key={government._id}
-                      value={government._id}
-                      selected={index === 0 && true}
-                    >
-                      {government.name}
-                    </option>
-                  )
-                )}
+                <option value="null" selected>
+                  please select
+                </option>
+                {listGovernment.map((government: IGovernment) => (
+                  <option key={government._id} value={government._id}>
+                    {government.name}
+                  </option>
+                ))}
                 <option value="">create Government</option>
               </select>
             )}

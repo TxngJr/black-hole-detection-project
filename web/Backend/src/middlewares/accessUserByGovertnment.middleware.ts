@@ -27,8 +27,8 @@ const accessUser = async (
       return res.status(400).json({ message: "Government not found" });
     }
 
-    if (findUser!._id.equals(findGovernment._userId)) {
-      return res.status(400).json({ message: "You can't access self or other government" });
+    if(findUser!._id.equals(req.user!._id)){
+      return res.status(400).json({ message: "You can't access self" });
     }
 
     if (

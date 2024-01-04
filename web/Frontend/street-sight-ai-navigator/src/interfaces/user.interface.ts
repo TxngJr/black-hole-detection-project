@@ -3,11 +3,10 @@ import { IGovernment } from "./government.interface";
 export interface IUser {
   _id: string | any;
   username: string;
-  hashPassword?: string;
   role: UserRole;
   status: UserStatus;
   _governmentId: IGovernment | string | any;
-  token: string;
+  token?: string;
 }
 
 export interface IRegisterApiRequest {

@@ -2,12 +2,27 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { ApiResponse } from "../interfaces/gobal.interface";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import TableLatLng from "../components/TableLatLng";
+import TableHoldsComponent from "../components/TableHoldsComponent";
 import { deleteHoldApi, getHoldsApi } from "../services/hold.service";
 import { IHold } from "../interfaces/hold.interface";
-import { API_BASE_URL, GOOGLE_MAP_API_KEY } from "../constants";
-import { UserRole } from "../interfaces/user.interface";
+import { GOOGLE_MAP_API_KEY } from "../constants";
+import { IUser, UserRole, UserStatus } from "../interfaces/user.interface";
 import { NavigateFunction, useNavigate } from "react-router-dom";
+import NotActiveComponent from "../components/NotActiveComponent";
+import HoldDetailComponent from "../components/HoldDetailComponent";
+import {
+  deleteUserApi,
+  fetchUsersApi,
+  updateRoleUserApi,
+  updateStatusUserApi,
+} from "../services/user.service";
+import TableUsersComponent from "../components/TableUsersComponent";
+import { fetchMachineCanUseApi } from '../services/machine.service';
+import {
+  addMachineInGovernmentApi,
+  dropMachineInGovernmentApi,
+} from "../services/government.service";
+import { IMachine } from "../interfaces/mahine.interface";
 
 function HomePage() {
   const { isLoaded } = useJsApiLoader({
@@ -22,35 +37,109 @@ function HomePage() {
   }, []);
 
   const { user, removeUser } = useContext(AuthContext);
-  const [holds, setHolds] = useState<IHold[]>([
-    {
-      _id: "",
-      position: { lat: 0, lng: 0 },
-      address: "",
-      path: "",
-      _machineId: "",
-    },
-  ]);
+  const [holds, setHolds] = useState<IHold[]>();
   const [hold, setHold] = useState<IHold | null>();
-  const [table, setTable] = useState<boolean>(false);
+  const [machinesCanUse, setMachinesCanUse] = useState<IMachine[]>();
+  const [tableHolds, setTableHolds] = useState<boolean>(false);
+  const [users, setUsers] = useState<IUser[]>();
+  const [tableUsers, setTabUsers] = useState<boolean>(false);
 
   const navigate: NavigateFunction = useNavigate();
 
   const fetchHolds = async () => {
-    const response: ApiResponse<IHold> = await getHoldsApi(user!.token);
+    const response: ApiResponse<IHold> = await getHoldsApi(user!.token!);
     if (!response.status) {
-      return
+      return;
     }
     return setHolds(response.data);
   };
 
   const deleteHold = async (id: string) => {
-    const response: ApiResponse<IHold> = await deleteHoldApi(id, user!.token);
+    const response: ApiResponse<IHold> = await deleteHoldApi(id, user!.token!);
     if (!response.status) {
-      return
+      return;
     }
-    setHold(null);
-    return fetchHolds();
+    fetchHolds();
+    return setHold(null);
+  };
+
+  const fetchMachineCanUse = async () => {
+    const response: ApiResponse<IMachine> = await fetchMachineCanUseApi(user!.token!);
+    if (!response.status) {
+      return;
+    }
+    fetchUsers();
+    return setMachinesCanUse(response.data);
+  }
+
+  const addMachine = async (_governmentId: string, _machineId: string) => {
+    const response: ApiResponse<IHold> = await addMachineInGovernmentApi({
+      _governmentId,
+      _machineId,
+      token: user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+
+    fetchUsers();
+    return fetchMachineCanUse();
+  };
+
+  const dropMachine = async (_governmentId: string, _machineId: string) => {
+    const response: ApiResponse<IHold> = await dropMachineInGovernmentApi({
+      _governmentId,
+      _machineId,
+      token: user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    fetchUsers();
+    return fetchMachineCanUse();
+  };
+
+  const fetchUsers = async () => {
+    const response: ApiResponse<IUser> = await fetchUsersApi(user!.token!);
+    if (!response.status) {
+      return;
+    }
+    return setUsers(response.data);
+  };
+
+  const changeStatusUser = async (_id: string, status: UserStatus) => {
+    const response: ApiResponse<IUser> = await updateStatusUserApi({
+      _id,
+      status,
+      token: user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    return fetchUsers();
+  };
+
+  const changeRoleUser = async (_id: string, role: UserRole) => {
+    const response: ApiResponse<IUser> = await updateRoleUserApi({
+      _id,
+      role,
+      token: user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    return fetchUsers();
+  };
+
+  const deleteUser = async (_id: string) => {
+    const response: ApiResponse<IUser> = await deleteUserApi({
+      _id,
+      token: user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    return fetchUsers();
   };
 
   const logout = () => {
@@ -60,8 +149,12 @@ function HomePage() {
 
   useEffect(() => {
     fetchHolds();
+    fetchUsers();
+    fetchMachineCanUse();
     const interval = setInterval(() => {
       fetchHolds();
+      fetchUsers();
+      fetchMachineCanUse();
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -84,28 +177,15 @@ function HomePage() {
         }}
         onLoad={onLoad}
       >
-          <div
-            style={{
-              position: "absolute",
-              bottom: "2%",
-              right: "1%",
-            }}
-          >
-            <button
-              style={{
-                borderRadius: "50px",
-                background: "#d4c013",
-                width: "150px",
-                padding: "6%",
-                textAlign: "center",
-                fontSize: "24px",
-                cursor: "pointer",
-              }}
-              onClick={() => navigate("/dashboard")}
-            >
-              Dashboard
-            </button>
-          </div>
+        <div
+          style={{
+            position: "absolute",
+            top: "10%",
+            right: "1%",
+          }}
+        >
+          <h1>{user?._governmentId.name}</h1>
+        </div>
         <div
           style={{
             position: "absolute",
@@ -138,175 +218,76 @@ function HomePage() {
           <button
             style={{
               borderRadius: "50px",
-              background: table ? "#f44336" : "#66DCAD",
+              background: "#66DCAD",
               width: "120px",
               padding: "6%",
               textAlign: "center",
               fontSize: "24px",
               cursor: "pointer",
             }}
-            onClick={() => setTable(!table)}
+            onClick={() => setTableHolds(!tableHolds)}
           >
             Table
           </button>
         </div>
-        {table && (
-          <TableLatLng onClickCancel={() => setTable(!table)} holds={holds} />
-        )}
-        {hold && (
-          <div
+        <div
+          style={{
+            position: "absolute",
+            bottom: "2%",
+            right: "1%",
+          }}
+        >
+          <button
             style={{
-              position: "absolute",
-              top: "0",
-              left: "0",
-              right: "0",
-              bottom: "0",
-              backgroundColor: "rgba(0, 0, 0, 0.2)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "5%",
+              borderRadius: "50px",
+              background: "#e3df0e",
+              width: "150px",
+              padding: "6%",
+              textAlign: "center",
+              fontSize: "24px",
+              cursor: "pointer",
             }}
-            onClick={() => setHold(null)}
+            onClick={() => setTabUsers(!tableUsers)}
           >
-            <div
-              style={{
-                position: "relative",
-                display: "flex",
-                background: "#FFFFFF",
-                borderRadius: "50px",
-                width: "100%",
-                height: "100%",
-                padding: "2%",
-              }}
-            >
-              <img
-                style={{
-                  minWidth: "330px",
-                  maxWidth: "1250px",
-                  width: "100%",
-                  height: "100%",
-                  overflow: "hidden",
-                  objectFit: "contain",
-                }}
-                alt={`Image ${hold._id}`}
-                src={`${API_BASE_URL}/holds/img?pathImg=${hold.path}`}
-              />
-              <div
-                style={{
-                  display: "block",
-                  width: "30%",
-                  padding: "0.7% 2%",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                  }}
-                >
-                  <h1
-                    style={{
-                      fontSize: "20px",
-                    }}
-                  >
-                    Latitude :
-                  </h1>
-                  <h1
-                    style={{
-                      fontSize: "20px",
-                    }}
-                  >
-                    {hold.position.lat}
-                  </h1>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                  }}
-                >
-                  <h1
-                    style={{
-                      fontSize: "20px",
-                    }}
-                  >
-                    Longitude :
-                  </h1>
-                  <h1
-                    style={{
-                      fontSize: "20px",
-                    }}
-                  >
-                    {hold.position.lng}
-                  </h1>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                  }}
-                >
-                  <h1
-                    style={{
-                      whiteSpace: "nowrap",
-                      fontSize: "20px",
-                      marginRight: "1%",
-                    }}
-                  >
-                    Address :
-                  </h1>
-                  <h1
-                    style={{
-                      fontSize: "20px",
-                    }}
-                  >
-                    {hold.address}
-                  </h1>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                  }}
-                >
-                  <h1
-                    style={{
-                      whiteSpace: "nowrap",
-                      fontSize: "20px",
-                      marginRight: "1%",
-                    }}
-                  >
-                    Mac Address Pi 4 :
-                  </h1>
-                  <h1
-                    style={{
-                      fontSize: "16px",
-                    }}
-                  >
-                    {hold._machineId}
-                  </h1>
-                </div>
-                {(user!.role == UserRole.ADMIN || user!.role == UserRole.SUPERADMIN) && (
-                  <button
-                    style={{
-                      position: "absolute",
-                      bottom: "2%",
-                      right: "1%",
-                      borderRadius: "50px",
-                      background: "#f44336",
-                      width: "120px",
-                      padding: "1%",
-                      textAlign: "center",
-                      fontSize: "24px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => deleteHold(hold._id!)}
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+            Dashboard
+          </button>
+        </div>
+
+        {hold && (
+          <HoldDetailComponent
+            hold={hold}
+            onClickCancel={() => setHold(null)}
+            canDelete={
+              user!.role == UserRole.ADMIN || user!.role == UserRole.SUPERADMIN
+            }
+            onClickDelete={() => deleteHold(hold._id!)}
+          />
+        )}
+        {tableUsers && (
+          <TableUsersComponent
+            user={user!}
+            users={users!}
+            machineCanUse={ machinesCanUse! }
+            onClickCancel={() => setTabUsers(!tableUsers)}
+            onClickDelete={(_id) => deleteUser(_id!)}
+            onChangeStatus={(_id, status) => changeStatusUser(_id!, status)}
+            onChangeRole={(_id, role) => changeRoleUser(_id!, role)}
+            onAddMachine={(_governmentId, _machineId) =>
+              addMachine(_governmentId, _machineId)
+            }
+            onDropMachine={(_governmentId, _machineId) =>
+              dropMachine(_governmentId, _machineId)
+            }
+          />
+        )}
+        {tableHolds && (
+          <TableHoldsComponent
+            onClickCancel={() => setTableHolds(!tableHolds)}
+            holds={holds!}
+          />
+        )}
+        {user?.status === UserStatus.INACTIVE && (
+          <NotActiveComponent user={user} />
         )}
         {holds?.map((hold: IHold) => (
           <Marker

@@ -1,12 +1,12 @@
 import { API_BASE_URL } from "../constants";
 import { ApiResponse } from "../interfaces/gobal.interface";
 
-export const fetchOwnerCanUseApi = async (
+export const fetchMachineCanUseApi = async (
     token: string
   ): Promise<ApiResponse<any>> => {
     try {
       const response: Response = await fetch(
-        API_BASE_URL + "/users/get-owner-can-use",
+        API_BASE_URL + "/machines/get-machine-can-use",
         {
           method: "GET",
           headers: {

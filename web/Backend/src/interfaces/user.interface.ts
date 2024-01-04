@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { IGovernment } from "./government.interface";
 
 export interface IUser {
   _id: string | any;
@@ -6,7 +7,7 @@ export interface IUser {
   hashPassword?: string;
   role: UserRole;
   status: UserStatus;
-  _governmentId: string | any;
+  _governmentId: IGovernment|string | any;
 }
 
 export interface RequestAndUser extends Request {

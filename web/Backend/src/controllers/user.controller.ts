@@ -12,6 +12,8 @@ import dotenv from "dotenv";
 import { IGovernment } from "../interfaces/government.interface";
 import GovernmentModel from "../models/government.model";
 import mongoose from "mongoose";
+import { IMachine } from "../interfaces/mahine.interface";
+import MachineModel from "../models/machine.model";
 
 dotenv.config();
 
@@ -148,7 +150,25 @@ const login = async (req: Request, res: Response) => {
 };
 
 const self = async (req: RequestAndUser, res: Response) => {
-  return res.status(200).json(req.user);
+  try {
+    const { _governmentId } = req.user!;
+    const findGovernment: IGovernment | null = await GovernmentModel.findById({
+      _id: _governmentId,
+    });
+    if (!findGovernment) {
+      return res.status(404).json({ message: "Government not found" });
+    }
+    const data: IUser = {
+      _id: req.user!._id,
+      username: req.user!.username,
+      role: req.user!.role,
+      status: req.user!.status,
+      _governmentId: findGovernment,
+    };
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(400).json({ message: "Have Something Wrong" });
+  }
 };
 
 const fetchUsers = async (req: RequestAndUser, res: Response) => {
@@ -156,14 +176,35 @@ const fetchUsers = async (req: RequestAndUser, res: Response) => {
     const { _governmentId, role, _id } = req.user!;
     const { page, pageSize }: any = req.query;
     if (role === UserRole.SUPERADMIN) {
-      const findUsers: IUser[] | null = await UserModel.find({
+      let findUsers: IUser[] | null = await UserModel.find({
         _id: { $nin: _id },
       })
         .populate("_governmentId")
         .select("-hashPassword")
         .skip((Number(page) - 1) * Number(pageSize))
         .limit(pageSize);
-      return res.status(200).json(findUsers);
+
+      const findUsersWithMachines = await Promise.all(
+        findUsers.map(async (user: IUser): Promise<IUser> => {
+          const findMachines: IMachine[] | null = await MachineModel.find({
+            _id: { $in: user._governmentId._machineListId },
+          });
+          return {
+            _id: user._id,
+            username: user.username,
+            role: user.role,
+            status: user.status,
+            _governmentId: {
+              _id: user._governmentId._id,
+              name: user._governmentId.name,
+              _userId: user._governmentId._userId,
+              _machineListId: findMachines,
+            },
+          };
+        })
+      );
+
+      return res.status(200).json(findUsersWithMachines);
     } else {
       const findUsers: IUser[] | null = await UserModel.find({
         _governmentId,

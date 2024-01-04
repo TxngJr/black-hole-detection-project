@@ -51,19 +51,22 @@ const createHold = async (req: Request, res: Response) => {
 const getHolds = async (req: RequestAndUser, res: Response) => {
   try {
     const { role, _governmentId } = req.user!;
-    const findGovernment: IGovernment | null = await GovernmentModel.findById({
-      _id: _governmentId,
-    });
-    if (!findGovernment) {
-      return res.status(400).json({ message: "Government not found" });
-    }
+    
     if (role === UserRole.SUPERADMIN) {
-      const findHolds: IHold[] | null = await HoldModel.find();
-      return res.status(200).json(findHolds);
-    } else {
-      const findHolds: IHold[] | null = await HoldModel.find({
-        _machineId: { $in: findGovernment._machineListId },
-      });
+      const findHolds: IHold[] | null = await HoldModel.find()
+        .populate("_machineId")
+        return res.status(200).json(findHolds);
+      } else {
+        const findGovernment: IGovernment | null = await GovernmentModel.findById({
+          _id: _governmentId,
+        });
+        if (!findGovernment) {
+          return res.status(400).json({ message: "Government not found" });
+        }
+        const findHolds: IHold[] | null = await HoldModel.find({
+          _machineId: { $in: findGovernment._machineListId },
+        })
+        .populate("_machineId")
       return res.status(200).json(findHolds);
     }
   } catch (err) {

@@ -6,7 +6,7 @@ interface Props {
   onClickCancel: () => void;
 }
 
-export default function TableLatLng(props: Props) {
+export default function TableHoldsComponent(props: Props) {
   const downloadPDF = async () => {
     return window.open("/pdf", "_blank");
   };

@@ -1,12 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthContext } from "./contexts/AuthContext";
 import { useContext, useEffect, useState } from "react";
-import { UserStatus, UserRole } from "./interfaces/user.interface";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
-import DashBoard from "./pages/DashBoardPage";
-import WaitActivePage from "./pages/WaitActivePage";
 import PdfHoldPage from "./pages/PdfHoldPage";
 
 function RouteApp() {
@@ -43,19 +40,11 @@ function RouteApp() {
     <BrowserRouter>
       <Routes>
         {user ? (
-          user.status === UserStatus.ACTIVE ? (
-            <>
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/pdf" element={<PdfHoldPage />} />
-              <Route path="/dashboard" element={<DashBoard />} />
-              <Route path="*" element={<Navigate to="/home" />} />
-            </>
-          ) : (
-            <>
-              <Route path="/wait-active" element={<WaitActivePage />} />
-              <Route path="*" element={<Navigate to="/wait-active" />} />
-            </>
-          )
+          <>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/pdf" element={<PdfHoldPage />} />
+            <Route path="*" element={<Navigate to="/home" />} />
+          </>
         ) : (
           <>
             <Route path="/login" element={<LoginPage />} />

@@ -24,7 +24,7 @@ function PdfHoldPage() {
   const [holds, setHolds] = useState<IHold[]>();
 
   const fetchHolds = async () => {
-    const response: ApiResponse<IHold> = await getHoldsApi(user!.token);
+    const response: ApiResponse<IHold> = await getHoldsApi(user!.token!);
     if (!response.status) {
       return;
     }

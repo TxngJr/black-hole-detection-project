@@ -37,7 +37,8 @@ const authenticateToken = async (
         }
         let findUser: IUser | null = await UserModel.findById(
           decode._id
-        ).populate("_governmentId");
+        )
+        // .populate("_governmentId");
         if (!findUser) {
           return res.status(403).json({ message: "User Not Found" });
         }
