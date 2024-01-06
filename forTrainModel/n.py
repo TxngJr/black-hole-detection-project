@@ -5,3 +5,4 @@ def generate_negative_description_file():
         for filename in os.listdir('dataset/neg'):
             f.write('dataset/neg/' + filename + '\n')
 generate_negative_description_file()
+
