@@ -17,12 +17,15 @@ import {
   updateStatusUserApi,
 } from "../services/user.service";
 import TableUsersComponent from "../components/TableUsersComponent";
-import { fetchMachineCanUseApi } from '../services/machine.service';
+import TableGovernmentComponent from "../components/TableGovernmentComponent";
 import {
   addMachineInGovernmentApi,
   dropMachineInGovernmentApi,
+  getGovernmentApi,
 } from "../services/government.service";
 import { IMachine } from "../interfaces/mahine.interface";
+import { fetchMachineCanUseApi } from "../services/machine.service";
+import { IGovernment } from "../interfaces/government.interface";
 
 function HomePage() {
   const { isLoaded } = useJsApiLoader({
@@ -39,38 +42,23 @@ function HomePage() {
   const { user, removeUser } = useContext(AuthContext);
   const [holds, setHolds] = useState<IHold[]>();
   const [hold, setHold] = useState<IHold | null>();
-  const [machinesCanUse, setMachinesCanUse] = useState<IMachine[]>();
   const [tableHolds, setTableHolds] = useState<boolean>(false);
   const [users, setUsers] = useState<IUser[]>();
   const [tableUsers, setTabUsers] = useState<boolean>(false);
+  const [tableGovernment, setTableGovernment] = useState<boolean>(false);
+  const [machinesCanUse, setMachinesCanUse] = useState<IMachine[]>();
+  const [listGovernment, setListGovernment] = useState<IGovernment[]>();
 
   const navigate: NavigateFunction = useNavigate();
-
-  const fetchHolds = async () => {
-    const response: ApiResponse<IHold> = await getHoldsApi(user!.token!);
-    if (!response.status) {
-      return;
-    }
-    return setHolds(response.data);
-  };
 
   const deleteHold = async (id: string) => {
     const response: ApiResponse<IHold> = await deleteHoldApi(id, user!.token!);
     if (!response.status) {
       return;
     }
+    setHold(null);
     fetchHolds();
-    return setHold(null);
   };
-
-  const fetchMachineCanUse = async () => {
-    const response: ApiResponse<IMachine> = await fetchMachineCanUseApi(user!.token!);
-    if (!response.status) {
-      return;
-    }
-    fetchUsers();
-    return setMachinesCanUse(response.data);
-  }
 
   const addMachine = async (_governmentId: string, _machineId: string) => {
     const response: ApiResponse<IHold> = await addMachineInGovernmentApi({
@@ -81,9 +69,8 @@ function HomePage() {
     if (!response.status) {
       return;
     }
-
-    fetchUsers();
-    return fetchMachineCanUse();
+    fetchGovernments();
+    fetchMachineCanUse();
   };
 
   const dropMachine = async (_governmentId: string, _machineId: string) => {
@@ -95,16 +82,19 @@ function HomePage() {
     if (!response.status) {
       return;
     }
-    fetchUsers();
-    return fetchMachineCanUse();
+    fetchGovernments();
+    fetchMachineCanUse();
   };
 
-  const fetchUsers = async () => {
-    const response: ApiResponse<IUser> = await fetchUsersApi(user!.token!);
+  const deleteUser = async (_id: string) => {
+    const response: ApiResponse<IUser> = await deleteUserApi({
+      _id,
+      token: user!.token!,
+    });
     if (!response.status) {
       return;
     }
-    return setUsers(response.data);
+    fetchUsers();
   };
 
   const changeStatusUser = async (_id: string, status: UserStatus) => {
@@ -116,7 +106,7 @@ function HomePage() {
     if (!response.status) {
       return;
     }
-    return fetchUsers();
+    fetchUsers();
   };
 
   const changeRoleUser = async (_id: string, role: UserRole) => {
@@ -128,18 +118,7 @@ function HomePage() {
     if (!response.status) {
       return;
     }
-    return fetchUsers();
-  };
-
-  const deleteUser = async (_id: string) => {
-    const response: ApiResponse<IUser> = await deleteUserApi({
-      _id,
-      token: user!.token!,
-    });
-    if (!response.status) {
-      return;
-    }
-    return fetchUsers();
+    fetchUsers();
   };
 
   const logout = () => {
@@ -147,14 +126,57 @@ function HomePage() {
     return navigate("/login");
   };
 
+  const fetchHolds = useCallback(async () => {
+    const response: ApiResponse<IHold> = await getHoldsApi(user!.token!);
+    if (!response.status) {
+      return;
+    }
+    setHolds(response.data);
+  }, []);
+
+  const fetchGovernments = useCallback(async () => {
+    const response: ApiResponse<{ _id: string; government: string }> =
+      await getGovernmentApi();
+    if (!response.status) {
+      return;
+    }
+    setListGovernment(response.data);
+  }, []);
+
+  const fetchMachineCanUse = useCallback(async () => {
+    const response: ApiResponse<IMachine> = await fetchMachineCanUseApi(
+      user!.token!
+    );
+    if (!response.status) {
+      return;
+    }
+    setMachinesCanUse(response.data);
+  }, []);
+
+  const fetchUsers = useCallback(async () => {
+    const response: ApiResponse<IUser> = await fetchUsersApi(user!.token!);
+    if (!response.status) {
+      return;
+    }
+
+    setUsers(response.data);
+  }, []);
+
   useEffect(() => {
     fetchHolds();
     fetchUsers();
     fetchMachineCanUse();
+    fetchGovernments();
     const interval = setInterval(() => {
-      fetchHolds();
-      fetchUsers();
-      fetchMachineCanUse();
+      if (!tableUsers || !tableGovernment || !tableHolds) {
+        fetchHolds();
+      }
+      if (tableUsers) {
+        fetchUsers();
+      } else if (tableGovernment) {
+        fetchMachineCanUse();
+        fetchGovernments();
+      }
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -267,11 +289,27 @@ function HomePage() {
           <TableUsersComponent
             user={user!}
             users={users!}
-            machineCanUse={ machinesCanUse! }
             onClickCancel={() => setTabUsers(!tableUsers)}
+            onClickCancelTableGovernment={() =>
+              setTableGovernment(!tableGovernment)
+            }
             onClickDelete={(_id) => deleteUser(_id!)}
             onChangeStatus={(_id, status) => changeStatusUser(_id!, status)}
             onChangeRole={(_id, role) => changeRoleUser(_id!, role)}
+          />
+        )}
+        {tableGovernment && (
+          <TableGovernmentComponent
+            user={user!}
+            governments={listGovernment}
+            machineCanUse={machinesCanUse}
+            onClickCancel={() => {
+              setTableGovernment(!tableGovernment), setTabUsers(!tableUsers);
+            }}
+            onClickBack={() => {
+              setTableGovernment(!tableGovernment);
+            }}
+            onClickDelete={(_id) => null}
             onAddMachine={(_governmentId, _machineId) =>
               addMachine(_governmentId, _machineId)
             }

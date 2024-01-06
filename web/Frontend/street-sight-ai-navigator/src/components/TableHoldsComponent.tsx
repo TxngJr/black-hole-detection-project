@@ -2,7 +2,7 @@ import { IHold } from "../interfaces/hold.interface";
 import { API_BASE_URL } from "../constants";
 
 interface Props {
-  holds: IHold[];
+  holds?: IHold[];
   onClickCancel: () => void;
 }
 

@@ -180,6 +180,7 @@ const fetchUsers = async (req: RequestAndUser, res: Response) => {
         // fillter: { $regex: search, $options: "i" },
         _id: { $nin: _id },
       })
+        .populate("_governmentId")
         .select("-hashPassword")
         .skip((Number(page) - 1) * Number(pageSize))
         .limit(pageSize);

@@ -1,22 +1,16 @@
-import { useState } from "react";
 import { IUser, UserRole, UserStatus } from "../interfaces/user.interface";
-import ListMachineComponent from "./ListMachineComponent";
-import { IMachine } from "../interfaces/mahine.interface";
 
 type Props = {
   user: IUser;
-  users: IUser[];
-  machineCanUse: IMachine[];
+  users?: IUser[];
   onClickCancel: () => void;
+  onClickCancelTableGovernment: () => void;
   onClickDelete: (_id: string | any) => void;
   onChangeStatus: (_id: string, status: UserStatus) => void;
   onChangeRole: (_id: string, role: UserRole) => void;
-  onAddMachine: (_governmentId: string, _machineId: string) => void;
-  onDropMachine: (_governmentId: string, _machineId: string) => void;
 };
 
 export default function TableUsersComponent(props: Props) {
-  const [listMachineSelect, setListMachineSelect] = useState<IUser>();
   return (
     <div
       style={{
@@ -32,19 +26,6 @@ export default function TableUsersComponent(props: Props) {
         justifyContent: "center",
       }}
     >
-        {listMachineSelect && (
-                      <ListMachineComponent
-                        machinehas={listMachineSelect._governmentId._machineListId}
-                        machineCanUse={props.machineCanUse}
-                        onAddMachine={(_id) =>
-                          props.onAddMachine(listMachineSelect._governmentId._id, _id)
-                        }
-                        onDropMachine={(_id) =>
-                          props.onDropMachine(listMachineSelect._governmentId._id, _id)
-                        }
-                        onClickCancel={() => setListMachineSelect(undefined)}
-                      />
-                    )}
       <div
         style={{
           position: "absolute",
@@ -67,6 +48,31 @@ export default function TableUsersComponent(props: Props) {
           Close
         </button>
       </div>
+      {props.user.role === UserRole.SUPERADMIN && (
+
+        <div
+        style={{
+          position: "absolute",
+          bottom: "2%",
+          right: "1%",
+        }}
+        >
+        <button
+          style={{
+            borderRadius: "50px",
+            background: "#1c03fc",
+            width: "160px",
+            padding: "6%",
+            textAlign: "center",
+            fontSize: "24px",
+            cursor: "pointer",
+          }}
+          onClick={() => props.onClickCancelTableGovernment()}
+          >
+          Government
+        </button>
+      </div>
+          )}
       <div
         style={{
           position: "relative",
@@ -89,14 +95,30 @@ export default function TableUsersComponent(props: Props) {
             paddingTop: "1%",
           }}
         >
+          <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+          >
+          <h1
+          style={{
+            fontSize: "48px",
+            paddingLeft: "2%",
+          }}
+          >
+          Dashboard User
+          </h1>
           <h1
             style={{
-              textAlign: "center",
+              paddingRight: "2%",
               fontSize: "48px",
             }}
-          >
+            >
             Hello {props.user.username} !
           </h1>
+            </div>
           <div
             style={{
               display: "block",
@@ -132,6 +154,8 @@ export default function TableUsersComponent(props: Props) {
               >
                 <h1>username</h1>
               </div>
+              {
+                    props.user.role === UserRole.SUPERADMIN && (
               <div
                 style={{
                   textAlign: "center",
@@ -141,6 +165,7 @@ export default function TableUsersComponent(props: Props) {
               >
                 <h1>government</h1>
               </div>
+                    )}
               <div
                 style={{
                   textAlign: "center",
@@ -162,11 +187,11 @@ export default function TableUsersComponent(props: Props) {
             </div>
             <div
               style={{
-                height: "calc(60vh - 40px)",
+                height: "calc(58vh - 40px)",
                 overflowY: "scroll",
               }}
             >
-              {props.users.map((listUser: IUser, index: any) => (
+              {props.users?.map((listUser: IUser, index: any) => (
                 <div
                   style={{
                     display: "flex",
@@ -196,20 +221,20 @@ export default function TableUsersComponent(props: Props) {
                   >
                     <h1>{listUser.username}</h1>
                   </div>
-                  <div
-                    style={{
-                      textAlign: "center",
-                      width: "100%",
-                      flex: 3,
-                    }}
-                    onClick={() => setListMachineSelect(listUser)}
-                  >
+                  {
+                    props.user.role === UserRole.SUPERADMIN && (
+                      <div
+                      style={{
+                        textAlign: "center",
+                        width: "100%",
+                        flex: 3,
+                      }}
+                      >
                     <h1>
-                      {props.user.role === UserRole.SUPERADMIN
-                        ? listUser._governmentId.name
-                        : props.user._governmentId.name}
+                        {listUser._governmentId.name}
                     </h1>
                   </div>
+                    )}
                   <div
                     style={{
                       textAlign: "center",
