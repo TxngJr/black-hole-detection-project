@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import PdfHoldPage from "./pages/PdfHoldPage";
+import Box from "@mui/material/Box";
 
 function RouteApp() {
   const { user } = useContext(AuthContext);
@@ -18,21 +19,17 @@ function RouteApp() {
 
   if (!authLoaded) {
     return (
-      <div
-        style={{
-          position: "absolute",
-          left: "0",
-          right: "0",
-          top: "0",
-          bottom: "0",
-          padding: "0 5%",
+      <Box
+        sx={{
           display: "flex",
-          alignItems: "center",
           justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          fontSize: "2rem",
         }}
       >
         Loading...
-      </div>
+      </Box>
     );
   }
 
@@ -41,6 +38,7 @@ function RouteApp() {
       <Routes>
         {user ? (
           <>
+            <Route path="/home" element={<HomePage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/pdf" element={<PdfHoldPage />} />
             <Route path="*" element={<Navigate to="/home" />} />

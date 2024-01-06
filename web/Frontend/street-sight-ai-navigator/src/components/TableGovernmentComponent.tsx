@@ -1,353 +1,192 @@
-import { useState } from "react";
+import { IUser } from "../interfaces/user.interface";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import DialogContent from "@mui/material/DialogContent";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import DialogActions from "@mui/material/DialogActions";
+import Paper from "@mui/material/Paper";
+import { useCallback, useEffect, useState } from "react";
+import { ApiResponse } from "../interfaces/gobal.interface";
+import {
+  addMachineInGovernmentApi,
+  dropMachineInGovernmentApi,
+  getGovernmentApi,
+} from "../services/government.service";
 import { IGovernment } from "../interfaces/government.interface";
 import { IMachine } from "../interfaces/mahine.interface";
-import { IUser } from "../interfaces/user.interface";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import { IHold } from "../interfaces/hold.interface";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Box from "@mui/material/Box";
+import { fetchMachineCanUseApi } from "../services/machine.service";
 
 type Props = {
-  user: IUser;
-  governments?: IGovernment[];
-  machineCanUse?: IMachine[];
-  onClickCancel: () => void;
-  onClickBack: () => void;
-  onClickDelete?: (_id: string | any) => void;
-  onAddMachine: (_governmentId: string, _machineId: string) => void;
-  onDropMachine: (_governmentId: string, _machineId: string) => void;
+  user: IUser | null;
+  isOpen: string | undefined;
+  isClose: () => void;
+  isOpenUser: () => void;
 };
 
 export default function TableGovernmentComponent(props: Props) {
-  const [isSelectAdd, setIsSelectAdd] = useState<boolean>(false);
-  const [isSelectDel, setIsSelectDel] = useState<boolean>(false);
-  const [seletedGovernment, setSeletedGovernment] = useState<IGovernment>();
+  // const [isSelectAdd, setIsSelectAdd] = useState<boolean>(false);
+  // const [isSelectDel, setIsSelectDel] = useState<boolean>(false);
+  const [governments, setGovernments] = useState<IGovernment[]>();
+  const [machinesCanUse, setMachinesCanUse] = useState<IMachine[]>();
+
+  const addMachine = async (_governmentId: string, _machineId: string) => {
+    const response: ApiResponse<IHold> = await addMachineInGovernmentApi({
+      _governmentId,
+      _machineId,
+      token: props.user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    fetchGovernments();
+    fetchMachineCanUse();
+  };
+
+  const dropMachine = async (_governmentId: string, _machineId: string) => {
+    const response: ApiResponse<IHold> = await dropMachineInGovernmentApi({
+      _governmentId,
+      _machineId,
+      token: props.user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    fetchGovernments();
+    fetchMachineCanUse();
+  };
+
+  const fetchGovernments = useCallback(async () => {
+    const response: ApiResponse<{ _id: string; government: string }> =
+      await getGovernmentApi();
+    if (!response.status) {
+      return;
+    }
+    setGovernments(response.data);
+  }, []);
+
+  const fetchMachineCanUse = useCallback(async () => {
+    const response: ApiResponse<IMachine> = await fetchMachineCanUseApi(
+      props.user!.token!
+    );
+    if (!response.status) {
+      return;
+    }
+    setMachinesCanUse(response.data);
+  }, []);
+
+  useEffect(() => {
+    fetchGovernments();
+    fetchMachineCanUse();
+  }, []);
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: "0",
-        right: "0",
-        top: "0",
-        bottom: "0",
-        backgroundColor: "rgba(0, 0, 0, 0.2)",
-        padding: "5%",
+    <Dialog
+      maxWidth="xl"
+      fullWidth
+      open={props.isOpen === "governmentTable"}
+      onClose={props.isClose}
+      sx={{
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          bottom: "2%",
-          right: "1%",
-        }}
-        >
-        <button
-          style={{
-            borderRadius: "50px",
-            background: "#ff6f00",
-            width: "160px",
-            padding: "6%",
-            textAlign: "center",
-            fontSize: "24px",
-            cursor: "pointer",
-          }}
-          onClick={() => props.onClickBack()}
-          >
-          Users
-        </button>
-      </div>
-      {isSelectAdd && (
-        <div
-        style={{
-          position: "absolute",
-          top:"50%",
-          left:"50%",
-          transform:"translate(-50%,-50%)",
-          zIndex:1000,
-        }}
-        
-        >
-          <select
-            onChange={(e) => {
-              props.onAddMachine(seletedGovernment!._id, e.target.value);
-              console.log(seletedGovernment!._id, e.target.value);
-              setIsSelectAdd(false);
-              setSeletedGovernment(undefined);
-            }}
-            style={{
-              width: '500px',
-              padding: '8px',
-              fontSize: '36px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              outline: 'none',
-            }}
-          >
-            <option value={""}>Select a value</option>
-            {props.machineCanUse?.map((machine: IMachine) => (
-              <option key={machine._id} value={machine._id}>
-                {machine.macAddress}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-      {isSelectDel && (
-        <div
-        style={{
-          position: "absolute",
-          top:"50%",
-          left:"50%",
-          transform:"translate(-50%,-50%)",
-          zIndex:1000,
-        }}
-        >
-          <select
-            onChange={(e) => {
-              props.onDropMachine(seletedGovernment!._id, e.target.value);
-              setIsSelectDel(false);
-              setSeletedGovernment(undefined);
-            }}
-            style={{
-              width: '500px',
-              padding: '8px',
-              fontSize: '36px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              outline: 'none',
-            }}
-          >
-            <option value={""}>Select a value</option>
-            {seletedGovernment?._machineListId.map((machine: IMachine) => (
-              <option key={machine._id} value={machine._id}>
-                {machine.macAddress}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "2%",
-          left: "1%",
-        }}
-      >
-        <button
-          style={{
-            borderRadius: "50px",
-            background: "#f44336",
-            width: "120px",
-            padding: "6%",
-            textAlign: "center",
-            fontSize: "24px",
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            if (isSelectAdd || isSelectDel) {
-              setIsSelectAdd(false);
-              setIsSelectDel(false);
-              setSeletedGovernment(undefined);
-              return;
-            }
-            props.onClickCancel()
-          }}
-        >
-          Close
-        </button>
-      </div>
-      <div
-        style={{
-          position: "relative",
+      <DialogTitle
+        sx={{
           display: "flex",
-          background: "#FFFFFF",
-          borderRadius: "50px",
-          width: "100%",
-          height: "100%",
-          alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
         }}
       >
-        <div
-          style={{
-            width: "95%",
-            height: "90%",
-            borderRadius: "20px",
-            background: "linear-gradient(180deg, #86DCAD 50%, #E9F191 100%)",
-            display: "block",
-            paddingTop: "1%",
+        <Typography variant="h6">Users Table</Typography>
+        <Button variant="contained" color="info" onClick={props.isOpenUser}>
+          Government
+        </Button>
+      </DialogTitle>
+      <DialogContent dividers>
+        <TableContainer
+          component={Paper}
+          sx={{
+            width: "70vw",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <h1
-              style={{
-                fontSize: "48px",
-                paddingLeft: "2%",
-              }}
-            >
-              Dashboard Government
-            </h1>
-            <h1
-              style={{
-                paddingRight: "2%",
-                fontSize: "48px",
-              }}
-            >
-              Hello {props.user.username} !
-            </h1>
-          </div>
-          <div
-            style={{
-              display: "block",
-              justifyContent: "center",
-              padding: "1%",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                background: "#FFFFFF",
-                padding: "10px",
-                borderRadius: "10px",
-              }}
-            >
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "100%",
-                  flex: 1,
-                }}
-              >
-                <h1>number</h1>
-              </div>
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "100%",
-                  flex: 3,
-                }}
-              >
-                <h1>government</h1>
-              </div>
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "100%",
-                  flex: 2,
-                }}
-              >
-                <h1>machine</h1>
-              </div>
-              <div
-                style={{
-                  width: "8%",
-                }}
-              />
-            </div>
-            <div
-              style={{
-                height: "calc(58vh - 40px)",
-                overflowY: "scroll",
-              }}
-            >
-              {props.governments?.map((government: IGovernment, index: any) => (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    background:
-                      index % 2 === 0 ? "" : "rgba(245, 245, 245, 0.5)",
-                  }}
-                  key={index}
-                >
-                  <div
-                    style={{
-                      textAlign: "center",
-                      width: "100%",
-                      flex: 1,
-                    }}
-                    onClick={() => props.onClickDelete!(government._id)}
-                  >
-                    <h1>{index + 1}</h1>
-                  </div>
-                  <div
-                    style={{
-                      textAlign: "center",
-                      width: "100%",
-                      flex: 3,
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Number</TableCell>
+                <TableCell>Government </TableCell>
+                <TableCell>Machine</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {governments?.map((government: IGovernment, index: number) => (
+                <TableRow key={government._id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{government.name}</TableCell>
+                  <TableCell
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
                     }}
                   >
-                    <h1>{government.name}</h1>
-                  </div>
-                  <div
-                    style={{
-                      textAlign: "center",
-                      width: "100%",
-                      flex: 2,
-                    }}
-                  >
-                    {government._machineListId.map((machine: IMachine) => (
-                      <div>
-                        <h1>{machine.macAddress}</h1>
-                      </div>
-                    ))}
-                  </div>
-                  <div
-                    style={{
-                      width: "8%",
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "#02ab2c",
-                        borderRadius: "50px",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: "3px",
-                      }}
-                      onClick={() => {
-                        setSeletedGovernment(government);
-                        setIsSelectAdd(true);
+                    <Box
+                      sx={{
+                        width: "100%",
                       }}
                     >
-                      <h1>add</h1>
-                    </div>
-                    <div
-                      style={{
-                        background: "#ed2b2b",
-                        borderRadius: "50px",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        padding: "3px",
-                        marginTop: "8px",
-                      }}
-                      onClick={() => {
-                        setSeletedGovernment(government);
-                        setIsSelectDel(true);
-                      }}
-                    >
-                      <h1>del</h1>
-                    </div>
-                  </div>
-                </div>
+                      {government._machineListId.map((machine: IMachine) => {
+                        return (
+                          <Typography
+                            onClick={() => {
+                              dropMachine(government._id, machine._id);
+                            }}
+                          >
+                            {machine.macAddress}
+                          </Typography>
+                        );
+                      })}
+                    </Box>
+                    <FormControl fullWidth margin="normal">
+                      <InputLabel id="add-machine">Add Machine</InputLabel>
+                      <Select
+                        name="add-machine"
+                        labelId="add-machine"
+                        id="add-machine"
+                        label="add-machine"
+                        onChange={(e: any) => {
+                          addMachine(government._id, e.target.value);
+                        }}
+                      >
+                        {machinesCanUse?.map((machine: IMachine) => {
+                          return (
+                            <MenuItem value={machine._id}>
+                              {machine.macAddress}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </FormControl>
+                  </TableCell>
+                </TableRow>
               ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={props.isClose}>Close</Button>
+      </DialogActions>
+    </Dialog>
   );
 }

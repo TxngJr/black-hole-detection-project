@@ -1,300 +1,199 @@
+import Dialog from "@mui/material/Dialog";
 import { IUser, UserRole, UserStatus } from "../interfaces/user.interface";
+import DialogTitle from "@mui/material/DialogTitle";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import DialogContent from "@mui/material/DialogContent";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import DialogActions from "@mui/material/DialogActions";
+import { useCallback, useEffect, useState } from "react";
+import { ApiResponse } from "../interfaces/gobal.interface";
+import {
+  deleteUserApi,
+  fetchUsersApi,
+  updateRoleUserApi,
+  updateStatusUserApi,
+} from "../services/user.service";
+import Paper from "@mui/material/Paper";
 
 type Props = {
-  user: IUser;
-  users?: IUser[];
-  onClickCancel: () => void;
-  onClickCancelTableGovernment: () => void;
-  onClickDelete: (_id: string | any) => void;
-  onChangeStatus: (_id: string, status: UserStatus) => void;
-  onChangeRole: (_id: string, role: UserRole) => void;
+  user: IUser | null;
+  isOpen: string | undefined;
+  isClose: () => void;
+  isOpenGovernment: () => void;
 };
 
 export default function TableUsersComponent(props: Props) {
+  const [users, setUsers] = useState<IUser[]>();
+  const deleteUser = async (_id: string) => {
+    const response: ApiResponse<IUser> = await deleteUserApi({
+      _id,
+      token: props.user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    fetchUsers();
+  };
+
+  const changeStatusUser = async (_id: string, status: UserStatus) => {
+    const response: ApiResponse<IUser> = await updateStatusUserApi({
+      _id,
+      status,
+      token: props.user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    fetchUsers();
+  };
+
+  const changeRoleUser = async (_id: string, role: UserRole) => {
+    const response: ApiResponse<IUser> = await updateRoleUserApi({
+      _id,
+      role,
+      token: props.user!.token!,
+    });
+    if (!response.status) {
+      return;
+    }
+    fetchUsers();
+  };
+  const fetchUsers = useCallback(async () => {
+    const response: ApiResponse<IUser> = await fetchUsersApi(
+      props.user!.token!
+    );
+    if (!response.status) {
+      return;
+    }
+
+    setUsers(response.data);
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: "0",
-        right: "0",
-        top: "0",
-        bottom: "0",
-        backgroundColor: "rgba(0, 0, 0, 0.2)",
-        padding: "5%",
+    <Dialog
+      maxWidth="xl"
+      fullWidth
+      open={props.isOpen === "usersTable"}
+      onClose={props.isClose}
+      sx={{
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          bottom: "2%",
-          left: "1%",
-        }}
-      >
-        <button
-          style={{
-            borderRadius: "50px",
-            background: "#f44336",
-            width: "120px",
-            padding: "6%",
-            textAlign: "center",
-            fontSize: "24px",
-            cursor: "pointer",
-          }}
-          onClick={() => props.onClickCancel()}
-        >
-          Close
-        </button>
-      </div>
-      {props.user.role === UserRole.SUPERADMIN && (
-
-        <div
-        style={{
-          position: "absolute",
-          bottom: "2%",
-          right: "1%",
-        }}
-        >
-        <button
-          style={{
-            borderRadius: "50px",
-            background: "#1c03fc",
-            width: "160px",
-            padding: "6%",
-            textAlign: "center",
-            fontSize: "24px",
-            cursor: "pointer",
-          }}
-          onClick={() => props.onClickCancelTableGovernment()}
-          >
-          Government
-        </button>
-      </div>
-          )}
-      <div
-        style={{
-          position: "relative",
+      <DialogTitle
+        sx={{
           display: "flex",
-          background: "#FFFFFF",
-          borderRadius: "50px",
-          width: "100%",
-          height: "100%",
-          alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
         }}
       >
-        <div
-          style={{
-            width: "95%",
-            height: "90%",
-            borderRadius: "20px",
-            background: "linear-gradient(180deg, #86DCAD 50%, #E9F191 100%)",
-            display: "block",
-            paddingTop: "1%",
+        <Typography variant="h6">Users Table</Typography>
+        <Button
+          variant="contained"
+          color="info"
+          onClick={props.isOpenGovernment}
+        >
+          Government
+        </Button>
+      </DialogTitle>
+      <DialogContent dividers>
+        <TableContainer
+          component={Paper}
+          sx={{
+            width: "70vw",
           }}
         >
-          <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-          >
-          <h1
-          style={{
-            fontSize: "48px",
-            paddingLeft: "2%",
-          }}
-          >
-          Dashboard User
-          </h1>
-          <h1
-            style={{
-              paddingRight: "2%",
-              fontSize: "48px",
-            }}
-            >
-            Hello {props.user.username} !
-          </h1>
-            </div>
-          <div
-            style={{
-              display: "block",
-              justifyContent: "center",
-              padding: "1%",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                background: "#FFFFFF",
-                padding: "10px",
-                borderRadius: "10px",
-              }}
-            >
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "100%",
-                  flex: 1,
-                }}
-              >
-                <h1>number</h1>
-              </div>
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "100%",
-                  flex: 2,
-                }}
-              >
-                <h1>username</h1>
-              </div>
-              {
-                    props.user.role === UserRole.SUPERADMIN && (
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "100%",
-                  flex: 3,
-                }}
-              >
-                <h1>government</h1>
-              </div>
-                    )}
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "100%",
-                  flex: 1,
-                }}
-              >
-                <h1>role</h1>
-              </div>
-              <div
-                style={{
-                  textAlign: "center",
-                  width: "100%",
-                  flex: 1,
-                }}
-              >
-                <h1>status</h1>
-              </div>
-            </div>
-            <div
-              style={{
-                height: "calc(58vh - 40px)",
-                overflowY: "scroll",
-              }}
-            >
-              {props.users?.map((listUser: IUser, index: any) => (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    padding: "10px",
-                    borderRadius: "10px",
-                  }}
-                  key={index}
-                >
-                  <div
-                    style={{
-                      textAlign: "center",
-                      width: "100%",
-                      flex: 1,
-                    }}
-                    onClick={() => props.onClickDelete!(listUser._id)}
-                  >
-                    <h1>{index + 1}</h1>
-                  </div>
-                  <div
-                    style={{
-                      textAlign: "center",
-                      width: "100%",
-                      flex: 2,
-                    }}
-                  >
-                    <h1>{listUser.username}</h1>
-                  </div>
-                  {
-                    props.user.role === UserRole.SUPERADMIN && (
-                      <div
-                      style={{
-                        textAlign: "center",
-                        width: "100%",
-                        flex: 3,
-                      }}
-                      >
-                    <h1>
-                        {listUser._governmentId.name}
-                    </h1>
-                  </div>
-                    )}
-                  <div
-                    style={{
-                      textAlign: "center",
-                      width: "100%",
-                      flex: 1,
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Number</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Government </TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Del</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users?.map((user: IUser, index: number) => (
+                <TableRow key={user._id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user._governmentId.name}</TableCell>
+                  <TableCell
+                    sx={{
+                      cursor: "pointer",
+                      color: user.role === UserRole.ADMIN ? "#fcba03" : "#61baae",
                     }}
                     onClick={() =>
-                      props.onChangeRole!(
-                        listUser._id,
-                        listUser.role === UserRole.ADMIN
-                          ? UserRole.USER
-                          : UserRole.ADMIN
+                      changeRoleUser(
+                        user._id,
+                        user.role === UserRole.USER
+                          ? UserRole.ADMIN
+                          : UserRole.USER
                       )
                     }
                   >
-                    <h1
-                      style={{
-                        color:
-                          listUser.role === UserRole.ADMIN
-                            ? "#bfb23b"
-                            : "#000000",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {listUser.role}
-                    </h1>
-                  </div>
-                  <div
-                    style={{
-                      textAlign: "center",
-                      width: "100%",
-                      flex: 1,
+                    {user.role}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      cursor: "pointer",
+                      color:
+                        user.status === UserStatus.ACTIVE ? "#00B051" : "#F00",
                     }}
                     onClick={() =>
-                      props.onChangeStatus!(
-                        listUser._id,
-                        listUser.status === UserStatus.ACTIVE
+                      changeStatusUser(
+                        user._id,
+                        user.status === UserStatus.ACTIVE
                           ? UserStatus.INACTIVE
                           : UserStatus.ACTIVE
                       )
                     }
                   >
-                    <h1
-                      style={{
-                        color:
-                          listUser.status === UserStatus.ACTIVE
-                            ? "#00B051"
-                            : "#F00",
-                        cursor: "pointer",
-                      }}
+                    {user.status}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      cursor: "pointer",
+                      color:
+                        user.status === UserStatus.ACTIVE ? "#00B051" : "#F00",
+                    }}
+                    onClick={() =>
+                      changeStatusUser(
+                        user._id,
+                        user.status === UserStatus.ACTIVE
+                          ? UserStatus.INACTIVE
+                          : UserStatus.ACTIVE
+                      )
+                    }
+                  >
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => deleteUser(user._id)}
                     >
-                      {listUser.status}
-                    </h1>
-                  </div>
-                </div>
+                      Del
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={props.isClose}>Close</Button>
+      </DialogActions>
+    </Dialog>
   );
 }

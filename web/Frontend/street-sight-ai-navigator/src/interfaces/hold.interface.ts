@@ -1,3 +1,5 @@
+import { IMachine } from "./mahine.interface";
+
 export interface IHold {
   _id: string | any;
   path: string;
@@ -6,6 +8,6 @@ export interface IHold {
     lng: number;
   };
   address: string;
-  _machineId: string | any;
+  _machineId: IMachine;
 }
 

@@ -1,212 +1,96 @@
 import { IHold } from "../interfaces/hold.interface";
 import { API_BASE_URL } from "../constants";
+import Dialog from "@mui/material/Dialog";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
+import Paper from "@mui/material/Paper";
+import DialogTitle from "@mui/material/DialogTitle";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Avatar from "@mui/material/Avatar";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 interface Props {
-  holds?: IHold[];
-  onClickCancel: () => void;
+  holds: IHold[] | undefined;
+  isOpen: string | undefined;
+  isClose: () => void;
 }
 
 export default function TableHoldsComponent(props: Props) {
   const downloadPDF = async () => {
     return window.open("/pdf", "_blank");
   };
+  const isWidthLessThan720 = useMediaQuery("(max-width:720px)");
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: "0",
-        right: "0",
-        top: "0",
-        bottom: "0",
-        backgroundColor: "rgba(0, 0, 0, 0.2)",
-        padding: "0 5%",
+    <Dialog
+      maxWidth="xl"
+      fullWidth
+      open={props.isOpen === "holdsTable"}
+      onClose={props.isClose}
+      sx={{
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          bottom: "2%",
-          left: "1%",
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
         }}
       >
-        <button
-          style={{
-            borderRadius: "50px",
-            background: "#f44336",
-            width: "120px",
-            padding: "6%",
-            textAlign: "center",
-            fontSize: "24px",
-            cursor: "pointer",
-          }}
-          onClick={() => props.onClickCancel()}
-        >
-          Close
-        </button>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          top: "2%",
-          right: "1%",
-        }}
-      >
-        <button
-          style={{
-            borderRadius: "50px",
-            background: "#e88615",
-            width: "150px",
-            padding: "6%",
-            textAlign: "center",
-            fontSize: "24px",
-            cursor: "pointer",
-          }}
-          onClick={downloadPDF}
-        >
-          Download
-        </button>
-      </div>
-      <div
-        style={{
-          width: "90%",
-          height: "95%",
-          borderRadius: "20px",
-          background: "linear-gradient(180deg, #86DCAD 50%, #E9F191 100%)",
-          display: "block",
-        }}
-      >
-        <div
-          style={{
-            display: "block",
-            justifyContent: "center",
-            padding: "1%",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-around",
-              background: "#FFFFFF",
-              padding: "10px",
-              borderRadius: "10px",
-            }}
-          >
-            <div
-              style={{
-                textAlign: "center",
-                width: "15%",
-              }}
-            >
-              <h1>number</h1>
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                width: "17.5%",
-              }}
-            >
-              <h1>latitude</h1>
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                width: "17.5%",
-              }}
-            >
-              <h1>longitude</h1>
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                width: "20%",
-              }}
-            >
-              <h1>address</h1>
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                width: "30%",
-              }}
-            >
-              <h1>img</h1>
-            </div>
-          </div>
-          <div
-            style={{
-              height: "calc(90vh - 40px)",
-              overflowY: "scroll",
-            }}
-          >
-            {props.holds?.map((hold: IHold, index: number) => (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-around",
-                  padding: "5px",
-                  borderRadius: "10px",
-                  fontSize: "10px",
-                }}
-              >
-                <div
-                  style={{
-                    textAlign: "center",
-                    width: "15%",
-                  }}
-                >
-                  <h1>{index + 1}</h1>
-                </div>
-                <div
-                  style={{
-                    textAlign: "center",
-                    width: "17.5%",
-                  }}
-                >
-                  <h1>{hold.position.lat}</h1>
-                </div>
-                <div
-                  style={{
-                    textAlign: "center",
-                    width: "17.5%",
-                  }}
-                >
-                  <h1>{hold.position.lng}</h1>
-                </div>
-                <div
-                  style={{
-                    textAlign: "center",
-                    width: "20%",
-                  }}
-                >
-                  <h1>{hold.address}</h1>
-                </div>
-                <div
-                  style={{
-                    textAlign: "center",
-                    width: "30%",
-                  }}
-                >
-                  <img
-                    style={{
-                      minWidth: "330px",
-                      maxWidth: "1250px",
-                      width: "100%",
-                      height: "100%",
-                      overflow: "hidden",
-                      objectFit: "contain",
-                    }}
-                    alt={`Image ${hold._id}`}
-                    src={`${API_BASE_URL}/holds/img?pathImg=${hold.path}`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+        <Typography variant="h6">Holds Table</Typography>
+        <Button variant="contained" color="warning" onClick={downloadPDF}>
+          PDF
+        </Button>
+      </DialogTitle>
+      <DialogContent dividers>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Number</TableCell>
+                <TableCell>Address</TableCell>
+                <TableCell>latitude </TableCell>
+                <TableCell>longitude</TableCell>
+                {!isWidthLessThan720 && <TableCell>Img</TableCell>}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {props.holds?.map((hold: IHold, index: number) => (
+                <TableRow key={hold._id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{hold.address}</TableCell>
+                  <TableCell>{hold.position.lat}</TableCell>
+                  <TableCell>{hold.position.lng}</TableCell>
+                  {!isWidthLessThan720 && (
+                    <TableCell>
+                      <Avatar
+                        src={`${API_BASE_URL}/holds/img?pathImg=${hold.path}`}
+                        alt="../assets/images/jivt.png"
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={props.isClose}>Close</Button>
+      </DialogActions>
+    </Dialog>
   );
 }

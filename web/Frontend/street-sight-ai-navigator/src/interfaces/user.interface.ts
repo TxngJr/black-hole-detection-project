@@ -11,15 +11,15 @@ export interface IUser {
 
 export interface IRegisterApiRequest {
   username: string;
-  password: string;
   government: string;
+  password: string;
 }
 
 export interface IRegisterForm {
   username: string;
+  government: string;
   password: string;
   confirmPassword: string;
-  government: string;
 }
 
 export interface ILoginApiRequestAndForm {
