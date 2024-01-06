@@ -174,37 +174,17 @@ const self = async (req: RequestAndUser, res: Response) => {
 const fetchUsers = async (req: RequestAndUser, res: Response) => {
   try {
     const { _governmentId, role, _id } = req.user!;
-    const { page, pageSize }: any = req.query;
+    const { page, pageSize, search }: any = req.query;
     if (role === UserRole.SUPERADMIN) {
-      let findUsers: IUser[] | null = await UserModel.find({
+      const findUsers: IUser[] | null = await UserModel.find({
+        // fillter: { $regex: search, $options: "i" },
         _id: { $nin: _id },
       })
-        .populate("_governmentId")
         .select("-hashPassword")
         .skip((Number(page) - 1) * Number(pageSize))
         .limit(pageSize);
 
-      const findUsersWithMachines = await Promise.all(
-        findUsers.map(async (user: IUser): Promise<IUser> => {
-          const findMachines: IMachine[] | null = await MachineModel.find({
-            _id: { $in: user._governmentId._machineListId },
-          });
-          return {
-            _id: user._id,
-            username: user.username,
-            role: user.role,
-            status: user.status,
-            _governmentId: {
-              _id: user._governmentId._id,
-              name: user._governmentId.name,
-              _userId: user._governmentId._userId,
-              _machineListId: findMachines,
-            },
-          };
-        })
-      );
-
-      return res.status(200).json(findUsersWithMachines);
+      return res.status(200).json(findUsers);
     } else {
       const findUsers: IUser[] | null = await UserModel.find({
         _governmentId,
@@ -267,6 +247,7 @@ const deleteUser = async (req: Request, res: Response) => {
     if (!deleteUser) {
       return res.status(404).json({ message: "User not found" });
     }
+
     return res.status(200).json({ message: "Delete user success" });
   } catch (err) {
     return res.status(400).json({ message: "Have Something Wrong" });

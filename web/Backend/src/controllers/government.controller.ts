@@ -5,7 +5,9 @@ import { Request, Response } from "express";
 
 const getGovernment = async (req: Request, res: Response) => {
   try {
-    const findGovernments: IGovernment[] | null = await GovernmentModel.find();
+    const findGovernments: IGovernment[] | null =
+      await GovernmentModel.find().populate("_machineListId");
+
     return res.status(200).json(findGovernments);
   } catch (err) {
     return res.status(400).json({ message: "Have Something Wrong" });
