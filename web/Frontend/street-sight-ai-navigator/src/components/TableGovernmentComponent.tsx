@@ -111,9 +111,9 @@ export default function TableGovernmentComponent(props: Props) {
           justifyContent: "space-between",
         }}
       >
-        <Typography variant="h6">Users Table</Typography>
+        <Typography variant="h6">Governments Table</Typography>
         <Button variant="contained" color="info" onClick={props.isOpenUser}>
-          Government
+          User
         </Button>
       </DialogTitle>
       <DialogContent dividers>
