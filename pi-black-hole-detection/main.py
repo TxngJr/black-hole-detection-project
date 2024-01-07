@@ -3,16 +3,24 @@ import serial
 import cv2
 import requests
 import os
-
-macAddress = ''
-while macAddress == '':
-    with open('/sys/class/net/eth0/address') as f:
-        macAddress = f.read()
+import sys
 
 url = 'http://gps.utc.ac.th:3000'
 img_folder = 'img/'
 gps = serial.Serial("/dev/ttyS0", baudrate=9600)
 cap = cv2.VideoCapture(0)
+
+macAddress = ''
+with open('/sys/class/net/eth0/address') as file:
+    macAddress = file.read()
+    file.close()
+if macAddress == '':
+    sys.exit("error to get macAddress")
+
+response = requests.post(url + "/machines/generate-machine", json={"macAddress": macAddress})
+if response.status_code != 200:
+    sys.exit("error to get machineId")
+_machineId = response.json()
 
 cascade_hold = cv2.CascadeClassifier('cascade.xml')
 
@@ -45,28 +53,24 @@ gps_thread.start()
 
 
 def uploadImgToCloud():
-    try:
-        response = requests.post(url + "/machines/generate-machine", json={"macAddress": macAddress})
-        if response.status_code != 200:
-            return print("error getting machineId")
-        _machineId = response.json()
-        print(_machineId)
-        for filename in os.listdir(img_folder):
-            if not filename.endswith(('.jpg')):
-                print("error file it not be .jpg")
-                continue
-            image_path = os.path.join(img_folder, filename)
-            with open(image_path, 'rb') as file:
-                response = requests.post(url + "/holds", files={'image': (filename, file, 'image/jpeg')},
+    files = os.listdir(img_folder)
+    image_files = [file for file in files if file.endswith('.jpg')]
+    for image_file in image_files:
+        image_path = os.path.join(img_folder, image_file)
+        with open(image_path, 'rb') as file:
+            try:
+                response = requests.post(url + "/holds", files={'image': (image_file, file, 'image/jpeg')},
                                          data={'_machineId': _machineId})
-                if response.status_code != 201:
-                    print("error to upload image")
-                    continue
-                file.close()
-                os.remove(image_path)
-                print('File uploaded successfully!')
-    except Exception as e:
-        print(f"error to upload image: {e}")
+                if response.status_code == 201:
+                    # file.close()
+                    os.remove(image_path)
+                    print(f"File {image_file} uploaded successfully.")
+                else:
+                    print(f"Failed to upload {image_file}. Status code: {response.status_code}")
+
+            except requests.RequestException as e:
+                print(f"Error uploading {image_file}: {e}")
+
 
 while True:
     key = cv2.waitKey(1) & 0xFF
