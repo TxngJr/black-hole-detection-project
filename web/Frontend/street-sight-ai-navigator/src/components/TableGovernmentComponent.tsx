@@ -37,8 +37,6 @@ type Props = {
 };
 
 export default function TableGovernmentComponent(props: Props) {
-  // const [isSelectAdd, setIsSelectAdd] = useState<boolean>(false);
-  // const [isSelectDel, setIsSelectDel] = useState<boolean>(false);
   const [governments, setGovernments] = useState<IGovernment[]>();
   const [machinesCanUse, setMachinesCanUse] = useState<IMachine[]>();
 
@@ -90,6 +88,10 @@ export default function TableGovernmentComponent(props: Props) {
   useEffect(() => {
     fetchGovernments();
     fetchMachineCanUse();
+    setInterval(() => {
+      fetchGovernments();
+      fetchMachineCanUse();
+    }, 3000);
   }, []);
   return (
     <Dialog
@@ -130,56 +132,58 @@ export default function TableGovernmentComponent(props: Props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {governments?.map((government: IGovernment, index: number) => (
-                <TableRow key={government._id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{government.name}</TableCell>
-                  <TableCell
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Box
+              {governments?.map((government: IGovernment, index: number) =>
+                government.name === "superAdmin" ? null : (
+                  <TableRow key={government._id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{government.name}</TableCell>
+                    <TableCell
                       sx={{
-                        width: "100%",
+                        display: "flex",
+                        flexDirection: "row",
                       }}
                     >
-                      {government._machineListId.map((machine: IMachine) => {
-                        return (
-                          <Typography
-                            onClick={() => {
-                              dropMachine(government._id, machine._id);
-                            }}
-                          >
-                            {machine.macAddress}
-                          </Typography>
-                        );
-                      })}
-                    </Box>
-                    <FormControl fullWidth margin="normal">
-                      <InputLabel id="add-machine">Add Machine</InputLabel>
-                      <Select
-                        name="add-machine"
-                        labelId="add-machine"
-                        id="add-machine"
-                        label="add-machine"
-                        onChange={(e: any) => {
-                          addMachine(government._id, e.target.value);
+                      <Box
+                        sx={{
+                          width: "100%",
                         }}
                       >
-                        {machinesCanUse?.map((machine: IMachine) => {
+                        {government._machineListId.map((machine: IMachine) => {
                           return (
-                            <MenuItem value={machine._id}>
+                            <Typography
+                              onClick={() => {
+                                dropMachine(government._id, machine._id);
+                              }}
+                            >
                               {machine.macAddress}
-                            </MenuItem>
+                            </Typography>
                           );
                         })}
-                      </Select>
-                    </FormControl>
-                  </TableCell>
-                </TableRow>
-              ))}
+                      </Box>
+                      <FormControl fullWidth margin="normal">
+                        <InputLabel id="add-machine">Add Machine</InputLabel>
+                        <Select
+                          name="add-machine"
+                          labelId="add-machine"
+                          id="add-machine"
+                          label="add-machine"
+                          onChange={(e: any) => {
+                            addMachine(government._id, e.target.value);
+                          }}
+                        >
+                          {machinesCanUse?.map((machine: IMachine) => {
+                            return (
+                              <MenuItem value={machine._id}>
+                                {machine.macAddress}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                  </TableRow>
+                )
+              )}
             </TableBody>
           </Table>
         </TableContainer>

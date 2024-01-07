@@ -20,6 +20,7 @@ import {
   updateStatusUserApi,
 } from "../services/user.service";
 import Paper from "@mui/material/Paper";
+import ConfirmAleartComponent from "./ConfirmAleartComponent";
 
 type Props = {
   user: IUser | null;
@@ -30,6 +31,8 @@ type Props = {
 
 export default function TableUsersComponent(props: Props) {
   const [users, setUsers] = useState<IUser[]>();
+  const [isOpenConfirm, setIsOpenConfirm] = useState<string>();
+  const [userOwnerGovernment, setUserOwnerGovernment] = useState<IUser>();
   const deleteUser = async (_id: string) => {
     const response: ApiResponse<IUser> = await deleteUserApi({
       _id,
@@ -38,6 +41,7 @@ export default function TableUsersComponent(props: Props) {
     if (!response.status) {
       return;
     }
+    setIsOpenConfirm(undefined);
     fetchUsers();
   };
 
@@ -77,123 +81,215 @@ export default function TableUsersComponent(props: Props) {
 
   useEffect(() => {
     fetchUsers();
+    setInterval(() => {
+      fetchUsers();
+    }, 3000);
   }, []);
   return (
-    <Dialog
-      maxWidth="xl"
-      fullWidth
-      open={props.isOpen === "usersTable"}
-      onClose={props.isClose}
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <DialogTitle
+    <>
+      <>
+        {isOpenConfirm && (
+          <ConfirmAleartComponent
+            isOpen={isOpenConfirm}
+            isClose={() => setIsOpenConfirm(undefined)}
+            isConfirm={() => deleteUser(userOwnerGovernment!._id)}
+            title="Delete User"
+            description={`If you delete this user, the government ${userOwnerGovernment?._governmentId.name} and any users within the government will also be deleted.`}
+          />
+        )}
+      </>
+      <Dialog
+        maxWidth="xl"
+        fullWidth
+        open={props.isOpen === "usersTable"}
+        onClose={props.isClose}
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <Typography variant="h6">Users Table</Typography>
-        <Button
-          variant="contained"
-          color="info"
-          onClick={props.isOpenGovernment}
-        >
-          Government
-        </Button>
-      </DialogTitle>
-      <DialogContent dividers>
-        <TableContainer
-          component={Paper}
+        <DialogTitle
           sx={{
-            width: "70vw",
+            display: "flex",
+            justifyContent: "space-between",
           }}
         >
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Number</TableCell>
-                <TableCell>Username</TableCell>
-                <TableCell>Government </TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Del</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users?.map((user: IUser, index: number) => (
-                <TableRow key={user._id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user._governmentId.name}</TableCell>
+          <Typography variant="h6">Users Table</Typography>
+          {props.user?.role === UserRole.SUPERADMIN && (
+            <Button
+              variant="contained"
+              color="info"
+              onClick={props.isOpenGovernment}
+            >
+              Government
+            </Button>
+          )}
+        </DialogTitle>
+        <DialogContent dividers>
+          <TableContainer
+            component={Paper}
+            sx={{
+              width: "70vw",
+            }}
+          >
+            <Table>
+              <TableHead>
+                <TableRow
+                  sx={{
+                    display: "flex",
+                    width: "100%",
+                  }}
+                >
                   <TableCell
                     sx={{
-                      cursor: "pointer",
-                      color: user.role === UserRole.ADMIN ? "#fcba03" : "#61baae",
+                      flex: 1,
                     }}
-                    onClick={() =>
-                      changeRoleUser(
-                        user._id,
-                        user.role === UserRole.USER
-                          ? UserRole.ADMIN
-                          : UserRole.USER
-                      )
-                    }
                   >
-                    {user.role}
+                    Number
                   </TableCell>
                   <TableCell
                     sx={{
-                      cursor: "pointer",
-                      color:
-                        user.status === UserStatus.ACTIVE ? "#00B051" : "#F00",
+                      flex: 3,
                     }}
-                    onClick={() =>
-                      changeStatusUser(
-                        user._id,
-                        user.status === UserStatus.ACTIVE
-                          ? UserStatus.INACTIVE
-                          : UserStatus.ACTIVE
-                      )
-                    }
                   >
-                    {user.status}
+                    Username
                   </TableCell>
                   <TableCell
                     sx={{
-                      cursor: "pointer",
-                      color:
-                        user.status === UserStatus.ACTIVE ? "#00B051" : "#F00",
+                      flex: 4,
                     }}
-                    onClick={() =>
-                      changeStatusUser(
-                        user._id,
-                        user.status === UserStatus.ACTIVE
-                          ? UserStatus.INACTIVE
-                          : UserStatus.ACTIVE
-                      )
-                    }
                   >
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={() => deleteUser(user._id)}
+                    Government{" "}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      flex: 1,
+                    }}
+                  >
+                    Role
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      flex: 1,
+                    }}
+                  >
+                    Status
+                  </TableCell>
+                  {props.user?.role !== UserRole.USER && (
+                    <TableCell
+                      sx={{
+                        flex: 2,
+                      }}
                     >
                       Del
-                    </Button>
-                  </TableCell>
+                    </TableCell>
+                  )}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={props.isClose}>Close</Button>
-      </DialogActions>
-    </Dialog>
+              </TableHead>
+              <TableBody>
+                {users?.map((user: IUser, index: number) => (
+                  <TableRow
+                    key={user._id}
+                    sx={{
+                      display: "flex",
+                      width: "100%",
+                    }}
+                  >
+                    <TableCell
+                      sx={{
+                        flex: 1,
+                      }}
+                    >
+                      {index + 1}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        flex: 3,
+                      }}
+                    >
+                      {user.username}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        flex: 4,
+                      }}
+                    >
+                      {user._governmentId.name}
+                      {user._id === user._governmentId._userId && "(Owner)"}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        flex: 1,
+                        cursor: "pointer",
+                        color:
+                          user.role === UserRole.ADMIN ? "#fcba03" : "#61baae",
+                      }}
+                      onClick={() =>
+                        changeRoleUser(
+                          user._id,
+                          user.role === UserRole.USER
+                            ? UserRole.ADMIN
+                            : UserRole.USER
+                        )
+                      }
+                    >
+                      {user.role}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        flex: 1,
+                        cursor: "pointer",
+                        color:
+                          user.status === UserStatus.ACTIVE
+                            ? "#00B051"
+                            : "#F00",
+                      }}
+                      onClick={() =>
+                        changeStatusUser(
+                          user._id,
+                          user.status === UserStatus.ACTIVE
+                            ? UserStatus.INACTIVE
+                            : UserStatus.ACTIVE
+                        )
+                      }
+                    >
+                      {user.status}
+                    </TableCell>
+                    {props.user?.role !== UserRole.USER && (
+                      <TableCell
+                        sx={{
+                          flex: 2,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          color="error"
+                          onClick={() =>
+                            user._id === user._governmentId._userId
+                              ? (setIsOpenConfirm("confirm"),
+                                setUserOwnerGovernment(user))
+                              : deleteUser(user._id)
+                          }
+                          size="medium"
+                        >
+                          Del
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={props.isClose}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

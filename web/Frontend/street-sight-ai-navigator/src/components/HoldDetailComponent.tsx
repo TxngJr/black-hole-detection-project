@@ -44,7 +44,13 @@ export default function HoldDetailComponent(props: Props) {
           justifyContent: "space-between",
         }}
       >
-        <Typography variant="h6">
+        <Typography variant="h6"
+        sx={{
+          "@media (max-width: 500px)": {
+            fontSize: "13px",
+          },
+        }}
+        >
           macAddress {props.hold?._machineId.macAddress}
         </Typography>
         {props.user?.role !== UserRole.USER && (
@@ -85,8 +91,8 @@ export default function HoldDetailComponent(props: Props) {
               <TableHead>
                 <TableRow>
                   <TableCell>Address</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Age</TableCell>
+                  <TableCell>latitude</TableCell>
+                  <TableCell>longitude</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

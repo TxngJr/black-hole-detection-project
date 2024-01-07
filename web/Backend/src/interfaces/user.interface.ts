@@ -7,7 +7,7 @@ export interface IUser {
   hashPassword?: string;
   role: UserRole;
   status: UserStatus;
-  _governmentId: IGovernment|string | any;
+  _governmentId: IGovernment | string | any;
 }
 
 export interface RequestAndUser extends Request {

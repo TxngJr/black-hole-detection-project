@@ -244,11 +244,33 @@ const changeRoleUser = async (req: RequestAndUser, res: Response) => {
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const { _id }: any = req.query;
-    const deleteUser = await UserModel.findByIdAndDelete(_id);
+    const findUser: IUser | null = await UserModel.findById(_id).populate(
+      "_governmentId"
+    );
+    if (!findUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const deleteUser = await UserModel.findByIdAndDelete(findUser._id);
     if (!deleteUser) {
       return res.status(404).json({ message: "User not found" });
     }
-
+    if (findUser._id.equals(findUser._governmentId._userId)) {
+      const findGovernment: IGovernment | null = await GovernmentModel.findOne({
+        _userId: findUser._id,
+      });
+      const deleteUsers = await UserModel.deleteMany({
+        _governmentId: findGovernment?._id,
+      });
+      if (!deleteUsers) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const deleteGovernment = await GovernmentModel.findByIdAndDelete(
+        findGovernment?._id
+      );
+      if (!deleteGovernment) {
+        return res.status(404).json({ message: "Government not found" });
+      }
+    }
     return res.status(200).json({ message: "Delete user success" });
   } catch (err) {
     return res.status(400).json({ message: "Have Something Wrong" });
